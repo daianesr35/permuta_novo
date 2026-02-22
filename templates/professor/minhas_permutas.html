@@ -1,0 +1,253 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Minhas Permutas - Sistema de Permuta{% endblock %}
+
+{% block extra_css %}
+<style>
+    .permutas-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        padding: 2rem;
+        border-radius: 20px;
+        margin-bottom: 2rem;
+        border-left: 5px solid var(--vermelho);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+    
+    .professor-badge {
+        background: linear-gradient(135deg, var(--verde) 0%, var(--vermelho) 100%);
+        color: white;
+        padding: 0.8rem 2rem;
+        border-radius: 50px;
+        display: inline-block;
+        font-weight: 600;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .table-permutas {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    }
+    
+    .table-permutas thead {
+        background: linear-gradient(135deg, var(--verde) 0%, var(--vermelho) 100%);
+        color: white;
+    }
+    
+    .table-permutas thead th {
+        padding: 1rem;
+        font-weight: 600;
+        font-size: 0.9rem;
+        border: none;
+    }
+    
+    .table-permutas tbody tr {
+        transition: all 0.3s ease;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .table-permutas tbody tr:hover {
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    }
+    
+    .table-permutas td {
+        padding: 1rem;
+        vertical-align: middle;
+    }
+    
+    .badge-status {
+        padding: 0.3rem 1rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        display: inline-block;
+    }
+    
+    .status-pendente { background: #fff3cd; color: #856404; }
+    .status-aprovada { background: #d4edda; color: #155724; }
+    .status-cancelada { background: #f8d7da; color: #721c24; }
+    
+    .btn-acao {
+        padding: 0.4rem 1rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+    
+    .btn-detalhes {
+        background: #e7f5ff;
+        color: #0d6efd;
+    }
+    
+    .btn-detalhes:hover {
+        background: #0d6efd;
+        color: white;
+    }
+    
+    .btn-cancelar {
+        background: #f8d7da;
+        color: #dc3545;
+    }
+    
+    .btn-cancelar:hover {
+        background: #dc3545;
+        color: white;
+    }
+    
+    .btn-pdf {
+        background: #dc3545;
+        color: white;
+    }
+    
+    .btn-pdf:hover {
+        background: #c82333;
+        transform: translateY(-2px);
+    }
+    
+    .reposicao-info {
+        font-size: 0.85rem;
+        padding: 0.3rem 0.8rem;
+        border-radius: 50px;
+        display: inline-block;
+    }
+    
+    .has-reposicao {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .no-reposicao {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 4rem;
+        background: #f8f9fa;
+        border-radius: 20px;
+    }
+    
+    .empty-state i {
+        font-size: 5rem;
+        background: linear-gradient(135deg, var(--verde) 0%, var(--vermelho) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 1rem;
+    }
+    
+    @media (max-width: 768px) {
+        .table-permutas {
+            display: none;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="permutas-header">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h2 class="mb-2">
+                <i class="fas fa-exchange-alt text-danger me-2"></i>
+                Minhas Solicitações de Permuta
+            </h2>
+            <p class="text-muted mb-0">
+                Acompanhe todas as suas solicitações e seus status
+            </p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <span class="professor-badge">
+                <i class="fas fa-chalkboard-teacher me-2"></i>
+                {{ professor.nome }}
+            </span>
+        </div>
+    </div>
+</div>
+
+{% if permutas %}
+<div class="table-permutas">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Data Aula</th>
+                <th>Turma</th>
+                <th>Disciplina</th>
+                <th>Substituto</th>
+                <th>Status</th>
+                <th>Reposição</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in permutas %}
+            <tr>
+                <td><strong>#{{ p.id }}</strong></td>
+                <td>{{ p.data_aula|date:"d/m/Y" }}</td>
+                <td>{{ p.horario.turma.codigo_turma }}</td>
+                <td>{{ p.horario.disciplina.nome }}</td>
+                <td>{{ p.professor_substituto.nome }}</td>
+                <td>
+                    <span class="badge-status 
+                        {% if p.status == 'PENDENTE' %}status-pendente
+                        {% elif p.status == 'APROVADA' %}status-aprovada
+                        {% elif p.status == 'CANCELADA' %}status-cancelada
+                        {% endif %}">
+                        {{ p.get_status_display }}
+                    </span>
+                </td>
+                <td>
+                    {% if p.tem_reposicao %}
+                        <span class="reposicao-info has-reposicao">
+                            <i class="fas fa-check-circle"></i>
+                            {{ p.reposicao.data_reposicao|date:"d/m/Y" }}
+                        </span>
+                    {% else %}
+                        <span class="reposicao-info no-reposicao">
+                            <i class="fas fa-clock"></i>
+                            Pendente
+                        </span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div class="btn-group" role="group">
+                        <a href="{% url 'detalhe_permuta' p.id %}" class="btn-acao btn-detalhes me-1" title="Detalhes">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="{% url 'comprovante_permuta_pdf' p.id %}" target="_blank" 
+                           class="btn-acao btn-pdf me-1" title="PDF">
+                            <i class="fas fa-file-pdf"></i>
+                        </a>
+                        {% if p.status != "CANCELADA" %}
+                            <a href="{% url 'cancelar_permuta' p.id %}" class="btn-acao btn-cancelar" title="Cancelar">
+                                <i class="fas fa-times"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state">
+    <i class="fas fa-exchange-alt"></i>
+    <h4>Nenhuma permuta encontrada</h4>
+    <p class="text-muted mb-4">
+        Você ainda não realizou nenhuma solicitação de permuta.
+    </p>
+    <a href="{% url 'meus_horarios' %}" class="btn-solicitar">
+        <i class="fas fa-clock me-2"></i>
+        Ver Meus Horários
+    </a>
+</div>
+{% endif %}
+{% endblock %}

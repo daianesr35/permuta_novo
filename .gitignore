@@ -1,0 +1,33 @@
+# Ambiente virtual
+.venv/
+venv/
+
+# Arquivos de banco de dados SQLite
+db.sqlite3
+*.sqlite3
+
+# Arquivos compilados do Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Logs
+*.log
+
+# Configurações do VS Code
+.vscode/
+
+# Arquivos estáticos coletados (se você usar collectstatic)
+staticfiles/
+static/
+
+# Arquivos de mídia (uploads)
+media/
+
+# Arquivos de ambiente / segredos
+.env
+.env.*
+
+# Sistema operacional / lixo
+.DS_Store
+Thumbs.db

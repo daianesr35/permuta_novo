@@ -1,0 +1,750 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Sistema de Permuta de Aulas - Gestão Inteligente{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --verde: #28a745;
+        --verde-escuro: #1e7e34;
+        --verde-claro: #d4edda;
+        --vermelho: #dc3545;
+        --vermelho-escuro: #bd2130;
+        --vermelho-claro: #f8d7da;
+        --cinza: #6c757d;
+        --cinza-claro: #f8f9fa;
+        --escuro: #343a40;
+    }
+    
+    /* Hero Section */
+    .hero-section {
+        background: linear-gradient(135deg, var(--verde) 0%, var(--vermelho) 100%);
+        color: white;
+        padding: 6rem 0;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0 0 L100 100 M100 0 L0 100" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></svg>');
+        opacity: 0.1;
+    }
+    
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+    }
+    
+    .hero-badge {
+        display: inline-block;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        padding: 0.5rem 2rem;
+        border-radius: 50px;
+        font-size: 1rem;
+        margin-bottom: 2rem;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .hero-title {
+        font-size: 3.5rem;
+        font-weight: 800;
+        margin-bottom: 1.5rem;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    .hero-subtitle {
+        font-size: 1.25rem;
+        max-width: 800px;
+        margin: 0 auto 2rem;
+        opacity: 0.95;
+    }
+    
+    .hero-stats {
+        display: flex;
+        justify-content: center;
+        gap: 4rem;
+        margin: 3rem 0;
+    }
+    
+    .hero-stat {
+        text-align: center;
+    }
+    
+    .hero-stat-number {
+        font-size: 2.5rem;
+        font-weight: 800;
+        display: block;
+    }
+    
+    .hero-stat-label {
+        font-size: 1rem;
+        opacity: 0.9;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .hero-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+    
+    .btn-hero {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 1rem 2.5rem;
+        border-radius: 50px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+    
+    .btn-hero-primary {
+        background: white;
+        color: var(--verde-escuro);
+        border: 2px solid transparent;
+    }
+    
+    .btn-hero-primary:hover {
+        background: transparent;
+        border-color: white;
+        color: white;
+        transform: translateY(-2px);
+    }
+    
+    .btn-hero-secondary {
+        background: transparent;
+        color: white;
+        border: 2px solid white;
+    }
+    
+    .btn-hero-secondary:hover {
+        background: white;
+        color: var(--verde-escuro);
+        transform: translateY(-2px);
+    }
+    
+    /* Seção Sobre */
+    .about-section {
+        padding: 5rem 0;
+        background: white;
+    }
+    
+    .section-title {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    
+    .section-title h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--escuro);
+        margin-bottom: 1rem;
+    }
+    
+    .section-title p {
+        color: var(--cinza);
+        font-size: 1.1rem;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .about-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2rem;
+    }
+    
+    .about-card {
+        text-align: center;
+        padding: 2rem;
+        border-radius: 20px;
+        background: var(--cinza-claro);
+        transition: all 0.3s ease;
+    }
+    
+    .about-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    .about-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, var(--verde) 0%, var(--vermelho) 100%);
+        border-radius: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        color: white;
+        font-size: 2rem;
+    }
+    
+    .about-card h3 {
+        font-size: 1.3rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+    
+    .about-card p {
+        color: var(--cinza);
+        line-height: 1.6;
+    }
+    
+    /* Seção Características */
+    .features-section {
+        padding: 5rem 0;
+        background: var(--cinza-claro);
+    }
+    
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2rem;
+    }
+    
+    .feature-item {
+        display: flex;
+        gap: 1.5rem;
+        align-items: flex-start;
+        padding: 2rem;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+    }
+    
+    .feature-item:hover {
+        transform: translateX(10px);
+        box-shadow: 0 10px 30px rgba(40, 167, 69, 0.1);
+    }
+    
+    .feature-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, var(--verde-claro) 0%, var(--vermelho-claro) 100%);
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+    }
+    
+    .feature-icon i {
+        background: linear-gradient(135deg, var(--verde) 0%, var(--vermelho) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    
+    .feature-text h3 {
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .feature-text p {
+        color: var(--cinza);
+        margin: 0;
+        line-height: 1.5;
+    }
+    
+    /* Seção CTA */
+    .cta-section {
+        padding: 5rem 0;
+        background: linear-gradient(135deg, var(--verde-escuro) 0%, var(--vermelho-escuro) 100%);
+        color: white;
+        text-align: center;
+    }
+    
+    .cta-content h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+    
+    .cta-content p {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        margin-bottom: 2rem;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    .btn-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: white;
+        color: var(--verde-escuro);
+        padding: 1rem 3rem;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+    
+    .btn-cta:hover {
+        background: transparent;
+        border-color: white;
+        color: white;
+        transform: scale(1.05);
+    }
+    
+    /* Seção Contato */
+    .contact-section {
+        padding: 5rem 0;
+        background: white;
+    }
+    
+    .contact-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+    }
+    
+    .contact-info h3 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+    }
+    
+    .contact-info p {
+        color: var(--cinza);
+        line-height: 1.8;
+        margin-bottom: 2rem;
+    }
+    
+    .contact-details {
+        list-style: none;
+        padding: 0;
+    }
+    
+    .contact-details li {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        padding: 0.5rem;
+        background: var(--cinza-claro);
+        border-radius: 10px;
+    }
+    
+    .contact-details i {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, var(--verde) 0%, var(--vermelho) 100%);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+    
+    .contact-form input,
+    .contact-form textarea {
+        width: 100%;
+        padding: 1rem;
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .contact-form input:focus,
+    .contact-form textarea:focus {
+        border-color: var(--verde);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+    }
+    
+    .btn-submit {
+        background: linear-gradient(135deg, var(--verde) 0%, var(--vermelho) 100%);
+        color: white;
+        border: none;
+        padding: 1rem 3rem;
+        border-radius: 50px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+    }
+    
+    /* Footer */
+    .footer {
+        background: var(--escuro);
+        color: white;
+        padding: 3rem 0 1.5rem;
+    }
+    
+    .footer-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .footer-col h4 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        position: relative;
+        padding-bottom: 0.5rem;
+    }
+    
+    .footer-col h4::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 50px;
+        height: 2px;
+        background: linear-gradient(135deg, var(--verde) 0%, var(--vermelho) 100%);
+    }
+    
+    .footer-col ul {
+        list-style: none;
+        padding: 0;
+    }
+    
+    .footer-col ul li {
+        margin-bottom: 0.8rem;
+    }
+    
+    .footer-col ul li a {
+        color: #adb5bd;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+    
+    .footer-col ul li a:hover {
+        color: var(--verde);
+    }
+    
+    .footer-bottom {
+        text-align: center;
+        padding-top: 2rem;
+        border-top: 1px solid #495057;
+        color: #adb5bd;
+        font-size: 0.9rem;
+    }
+    
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 2.5rem;
+        }
+        
+        .hero-stats {
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .hero-buttons {
+            flex-direction: column;
+        }
+        
+        .about-grid,
+        .features-grid,
+        .contact-grid,
+        .footer-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .feature-item {
+            flex-direction: column;
+            text-align: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container hero-content">
+        <div class="hero-badge">
+            <i class="fas fa-graduation-cap"></i>
+            SISTEMA DE PERMUTA DE AULAS
+        </div>
+        
+        <h1 class="hero-title">
+            Gestão Inteligente de Permutas
+        </h1>
+        
+        <p class="hero-subtitle">
+            Simplifique o processo de permutas e reposições de aulas na sua instituição. 
+            Uma solução completa para coordenadores e professores.
+        </p>
+        
+        <div class="hero-stats">
+            <div class="hero-stat">
+                <span class="hero-stat-number">150+</span>
+                <span class="hero-stat-label">Professores</span>
+            </div>
+            <div class="hero-stat">
+                <span class="hero-stat-number">30+</span>
+                <span class="hero-stat-label">Disciplinas</span>
+            </div>
+            <div class="hero-stat">
+                <span class="hero-stat-number">200+</span>
+                <span class="hero-stat-label">Turmas</span>
+            </div>
+            <div class="hero-stat">
+                <span class="hero-stat-number">500+</span>
+                <span class="hero-stat-label">Permutas</span>
+            </div>
+        </div>
+        
+        <div class="hero-buttons">
+            <a href="{% url 'login' %}" class="btn-hero btn-hero-primary">
+                <i class="fas fa-sign-in-alt"></i>
+                Acessar o Sistema
+            </a>
+            <a href="#contato" class="btn-hero btn-hero-secondary">
+                <i class="fas fa-headset"></i>
+                Falar com Especialista
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Seção Sobre -->
+<section class="about-section">
+    <div class="container">
+        <div class="section-title">
+            <h2>Somos mais que um sistema de permutas</h2>
+            <p>Uma solução completa para gestão acadêmica</p>
+        </div>
+        
+        <div class="about-grid">
+            <div class="about-card">
+                <div class="about-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h3>Gestão de Horários</h3>
+                <p>Visualize todos os seus horários de aula de forma clara e organizada.</p>
+            </div>
+            
+            <div class="about-card">
+                <div class="about-icon">
+                    <i class="fas fa-exchange-alt"></i>
+                </div>
+                <h3>Solicitação de Permutas</h3>
+                <p>Solicite permutas de forma rápida e acompanhe o status em tempo real.</p>
+            </div>
+            
+            <div class="about-card">
+                <div class="about-icon">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <h3>Registro de Reposições</h3>
+                <p>Registre reposições de forma simples e mantenha o histórico organizado.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Seção Características -->
+<section class="features-section">
+    <div class="container">
+        <div class="section-title">
+            <h2>Especialistas em Gestão Acadêmica</h2>
+            <p>Recursos pensados para facilitar o dia a dia de coordenadores e professores</p>
+        </div>
+        
+        <div class="features-grid">
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <div class="feature-text">
+                    <h3>Notificações em Tempo Real</h3>
+                    <p>Receba notificações sobre novas solicitações, confirmações e alterações nas permutas.</p>
+                </div>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="fas fa-file-pdf"></i>
+                </div>
+                <div class="feature-text">
+                    <h3>Comprovantes em PDF</h3>
+                    <p>Gere comprovantes de permutas e reposições para registro e documentação.</p>
+                </div>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="feature-text">
+                    <h3>Relatórios e Estatísticas</h3>
+                    <p>Acompanhe métricas e gere relatórios sobre permutas realizadas.</p>
+                </div>
+            </div>
+            
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="feature-text">
+                    <h3>Segurança e Controle</h3>
+                    <p>Sistema seguro com níveis de acesso diferenciados para cada perfil.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Seção CTA -->
+<section class="cta-section">
+    <div class="container">
+        <div class="cta-content">
+            <h2>Pronto para simplificar a gestão de permutas?</h2>
+            <p>Há quase 2 décadas entregando soluções incríveis para instituições de ensino em todo o Brasil.</p>
+            <a href="{% url 'login' %}" class="btn-cta">
+                <i class="fas fa-arrow-right"></i>
+                Comece Agora!
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Seção Contato -->
+<section id="contato" class="contact-section">
+    <div class="container">
+        <div class="section-title">
+            <h2>Fale com a gente</h2>
+            <p>Tire suas dúvidas ou solicite uma demonstração</p>
+        </div>
+        
+        <div class="contact-grid">
+            <div class="contact-info">
+                <h3>Entre em contato</h3>
+                <p>
+                    Estamos prontos para ajudar sua instituição a implementar 
+                    o melhor sistema de gestão de permutas do mercado.
+                </p>
+                
+                <ul class="contact-details">
+                    <li>
+                        <i class="fas fa-phone-alt"></i>
+                        <span>(31) 1234-5678</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-envelope"></i>
+                        <span>contato@permutas.com.br</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>Belo Horizonte - MG</span>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="contact-form">
+                <form>
+                    <input type="text" placeholder="Seu nome" required>
+                    <input type="email" placeholder="Seu e-mail" required>
+                    <input type="text" placeholder="Assunto">
+                    <textarea rows="5" placeholder="Sua mensagem" required></textarea>
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-paper-plane"></i>
+                        Enviar Mensagem
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>Sobre Nós</h4>
+                <p style="color: #adb5bd; line-height: 1.6;">
+                    Sistema especializado em gestão de permutas de aulas para instituições de ensino.
+                </p>
+            </div>
+            
+            <div class="footer-col">
+                <h4>Links Rápidos</h4>
+                <ul>
+                    <li><a href="#"><i class="fas fa-chevron-right"></i> Início</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-right"></i> Recursos</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-right"></i> Preços</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-right"></i> FAQ</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h4>Suporte</h4>
+                <ul>
+                    <li><a href="#"><i class="fas fa-chevron-right"></i> Central de Ajuda</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-right"></i> Documentação</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-right"></i> Tutoriais</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-right"></i> Contato</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h4>Redes Sociais</h4>
+                <ul>
+                    <li><a href="#"><i class="fab fa-facebook"></i> Facebook</a></li>
+                    <li><a href="#"><i class="fab fa-instagram"></i> Instagram</a></li>
+                    <li><a href="#"><i class="fab fa-linkedin"></i> LinkedIn</a></li>
+                    <li><a href="#"><i class="fab fa-youtube"></i> YouTube</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; {% now "Y" %} Sistema de Permuta de Aulas. Todos os direitos reservados.</p>
+            <p style="margin-top: 0.5rem; font-size: 0.8rem;">
+                <i class="fas fa-heart" style="color: var(--vermelho);"></i> 
+                Desenvolvido com dedicação para instituições de ensino
+            </p>
+        </div>
+    </div>
+</footer>
+
+<script>
+    // Smooth scroll para links internos
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+</script>
+<!-- IMPORTANTE: ESTE É O FECHAMENTO CORRETO DO BLOCK CONTENT -->
+{% endblock %}

@@ -1,0 +1,251 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block branding %}
+<div id="site-name">
+    <a href="{% url 'admin:index' %}" style="color: white; font-size: 1.5rem; font-weight: bold; text-decoration: none;">
+        <i class="fas fa-exchange-alt" style="margin-right: 10px; color: white;"></i>
+        Sistema de Permuta - Administração
+    </a>
+</div>
+{% if user.is_anonymous %}
+  {% include "admin/color_theme_toggle.html" %}
+{% endif %}
+{% endblock %}
+
+{% block nav-global %}
+<div style="float: right; margin-right: 20px; color: white;">
+    <span style="margin-right: 15px;">
+        <i class="fas fa-user-circle"></i> {{ user.get_full_name|default:user.username }}
+    </span>
+    <a href="{% url 'home' %}" style="color: white; text-decoration: none; margin-right: 15px; padding: 5px 10px; border-radius: 20px; transition: all 0.3s ease;">
+        <i class="fas fa-home"></i> Home
+    </a>
+    <a href="{% url 'admin_dashboard' %}" style="color: white; text-decoration: none; padding: 5px 10px; border-radius: 20px; transition: all 0.3s ease;">
+        <i class="fas fa-chart-line"></i> Dashboard
+    </a>
+</div>
+{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<style>
+    :root {
+        --verde: #28a745;
+        --verde-escuro: #1e7e34;
+        --verde-claro: #d4edda;
+        --vermelho: #dc3545;
+        --vermelho-escuro: #bd2130;
+        --vermelho-claro: #f8d7da;
+        --cinza: #6c757d;
+        --cinza-claro: #f8f9fa;
+        --escuro: #343a40;
+    }
+    
+    #header {
+        background: linear-gradient(135deg, var(--verde) 0%, var(--vermelho) 100%);
+        color: white;
+        padding: 15px 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    #branding h1, #branding h1 a {
+        color: white;
+        font-weight: 700;
+        font-size: 1.3rem;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    }
+    
+    #user-tools a {
+        color: white;
+        border-bottom: none;
+        transition: opacity 0.3s ease;
+    }
+    
+    #user-tools a:hover {
+        opacity: 0.8;
+    }
+    
+    /* Links de navegação no header */
+    .nav-global a:hover {
+        background: rgba(255,255,255,0.2);
+        backdrop-filter: blur(5px);
+    }
+    
+    /* Módulos */
+    .module h2, .module caption {
+        background: linear-gradient(135deg, var(--verde) 0%, var(--vermelho) 100%);
+        color: white;
+        font-weight: 600;
+        padding: 10px 15px;
+        border-radius: 5px 5px 0 0;
+    }
+    
+    .module {
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    
+    /* Breadcrumbs */
+    div.breadcrumbs {
+        background: linear-gradient(135deg, var(--verde) 0%, var(--vermelho) 100%);
+        color: white;
+        padding: 10px 20px;
+        opacity: 0.9;
+    }
+    
+    div.breadcrumbs a {
+        color: white;
+        text-decoration: underline;
+    }
+    
+    div.breadcrumbs a:hover {
+        text-decoration: none;
+    }
+    
+    /* Botões */
+    .button, input[type=submit], input[type=button], .submit-row input {
+        background: var(--verde);
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .button:hover, input[type=submit]:hover, input[type=button]:hover {
+        background: var(--verde-escuro);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3);
+    }
+    
+    .button.default {
+        background: var(--vermelho);
+    }
+    
+    .button.default:hover {
+        background: var(--vermelho-escuro);
+        box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
+    }
+    
+    /* Links */
+    a:link, a:visited {
+        color: var(--verde);
+    }
+    
+    a:hover {
+        color: var(--vermelho);
+    }
+    
+    /* Tabelas */
+    thead th {
+        background: linear-gradient(135deg, var(--verde) 0%, var(--vermelho) 100%);
+        color: white;
+        font-weight: 600;
+    }
+    
+    .row1 {
+        background: #f8f9fa;
+    }
+    
+    .row2 {
+        background: white;
+    }
+    
+    /* Paginação */
+    .paginator {
+        background: var(--cinza-claro);
+        border-top: 2px solid var(--verde);
+    }
+    
+    .paginator a:link, .paginator a:visited {
+        background: white;
+        color: var(--escuro);
+        border: 1px solid #dee2e6;
+        padding: 5px 10px;
+        border-radius: 5px;
+        margin: 0 2px;
+    }
+    
+    .paginator a:hover {
+        background: linear-gradient(135deg, var(--verde) 0%, var(--vermelho) 100%);
+        color: white;
+        border-color: transparent;
+    }
+    
+    .paginator .this-page {
+        background: linear-gradient(135deg, var(--verde) 0%, var(--vermelho) 100%);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+        margin: 0 2px;
+    }
+    
+    /* Filtros laterais */
+    #changelist-filter {
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    
+    #changelist-filter h2 {
+        background: linear-gradient(135deg, var(--verde) 0%, var(--vermelho) 100%);
+        color: white;
+    }
+    
+    #changelist-filter ul {
+        margin: 0;
+        padding: 10px;
+    }
+    
+    #changelist-filter li.selected a {
+        color: var(--vermelho);
+        font-weight: 600;
+    }
+    
+    /* Dashboard */
+    .dashboard .module table th {
+        background: var(--cinza-claro);
+        color: var(--escuro);
+        font-weight: 600;
+    }
+    
+    .dashboard .module table td a {
+        color: var(--verde);
+    }
+    
+    .dashboard .module table td a:hover {
+        color: var(--vermelho);
+    }
+    
+    /* Responsividade */
+    @media (max-width: 768px) {
+        #header {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        #branding {
+            margin-bottom: 10px;
+        }
+        
+        .nav-global {
+            float: none !important;
+            margin-right: 0 !important;
+            text-align: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% endblock %}

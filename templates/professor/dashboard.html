@@ -1,0 +1,361 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Dashboard do Professor - Sistema de Permuta{% endblock %}
+
+{% block extra_css %}
+<style>
+    .professor-header {
+        background: linear-gradient(135deg, var(--verde) 0%, #2ecc71 100%);
+        color: white;
+        border-radius: 30px;
+        padding: 2.5rem;
+        margin-bottom: 2.5rem;
+        box-shadow: 0 15px 35px rgba(46, 204, 113, 0.2);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .professor-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 300px;
+        height: 300px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 50%;
+    }
+    
+    .professor-avatar {
+        width: 100px;
+        height: 100px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        backdrop-filter: blur(10px);
+        border: 3px solid rgba(255,255,255,0.3);
+    }
+    
+    .professor-info h1 {
+        font-size: 2.2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .professor-badge {
+        background: rgba(255,255,255,0.2);
+        padding: 0.5rem 1.5rem;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        display: inline-block;
+        backdrop-filter: blur(5px);
+    }
+    
+    .professor-stats {
+        display: flex;
+        gap: 2rem;
+        margin-top: 1.5rem;
+    }
+    
+    .stat-item {
+        text-align: center;
+    }
+    
+    .stat-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        line-height: 1;
+    }
+    
+    .stat-label {
+        font-size: 0.85rem;
+        opacity: 0.9;
+        text-transform: uppercase;
+    }
+    
+    .section-title {
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 3px solid var(--verde);
+    }
+    
+    .section-title h2 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #2c3e50;
+    }
+    
+    .section-title h2 i {
+        color: var(--verde);
+        margin-right: 10px;
+    }
+    
+    .actions-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+    
+    .action-card {
+        background: white;
+        border-radius: 30px;
+        padding: 2.5rem 2rem;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+        text-decoration: none;
+        color: inherit;
+        border: 2px solid transparent;
+    }
+    
+    .action-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(46, 204, 113, 0.15);
+        border-color: var(--verde);
+    }
+    
+    .action-icon {
+        width: 100px;
+        height: 100px;
+        background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+        border-radius: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        font-size: 2.8rem;
+        color: var(--verde);
+        transition: all 0.3s ease;
+    }
+    
+    .action-card:hover .action-icon {
+        transform: scale(1.1) rotate(5deg);
+    }
+    
+    .action-card h3 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 0.8rem;
+    }
+    
+    .action-card p {
+        color: #7f8c8d;
+        margin-bottom: 1.5rem;
+    }
+    
+    .action-link {
+        color: var(--verde);
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .action-card:hover .action-link {
+        gap: 15px;
+    }
+    
+    .next-permutas {
+        background: #f8f9fa;
+        border-radius: 30px;
+        padding: 2rem;
+    }
+    
+    .next-permutas h3 {
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        color: #2c3e50;
+    }
+    
+    .next-permutas h3 i {
+        color: var(--verde);
+        margin-right: 10px;
+    }
+    
+    .permuta-item {
+        background: white;
+        border-radius: 15px;
+        padding: 1.2rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transition: all 0.3s ease;
+    }
+    
+    .permuta-item:hover {
+        transform: translateX(5px);
+        box-shadow: 0 5px 15px rgba(46, 204, 113, 0.1);
+    }
+    
+    .permuta-date {
+        background: #e8f5e9;
+        color: var(--verde);
+        padding: 0.3rem 1rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin-right: 1rem;
+    }
+    
+    .permuta-details h4 {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 0.2rem;
+    }
+    
+    .permuta-details p {
+        font-size: 0.85rem;
+        color: #7f8c8d;
+        margin: 0;
+    }
+    
+    .status-badge {
+        padding: 0.3rem 1rem;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    
+    .status-pendente {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .status-aprovada {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    @media (max-width: 768px) {
+        .actions-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .professor-info h1 {
+            font-size: 1.5rem;
+        }
+        
+        .professor-stats {
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="professor-header">
+    <div class="row align-items-center">
+        <div class="col-auto">
+            <div class="professor-avatar">
+                <i class="fas fa-chalkboard-teacher"></i>
+            </div>
+        </div>
+        <div class="col professor-info">
+            <h1>Olá, {{ professor.nome|default:usuario.get_full_name|default:usuario.username }}!</h1>
+            <div class="professor-badge">
+                <i class="fas fa-id-card me-2"></i>
+                Matrícula: {{ professor.matricula_siape|default:"---" }}
+            </div>
+            
+            <div class="professor-stats">
+                <div class="stat-item">
+                    <div class="stat-value">{{ total_horarios }}</div>
+                    <div class="stat-label">Horários</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">{{ total_permutas }}</div>
+                    <div class="stat-label">Permutas</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">{{ permutas_pendentes }}</div>
+                    <div class="stat-label">Pendentes</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">{{ permutas_substituto_pendentes }}</div>
+                    <div class="stat-label">Como Substituto</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="section-title">
+    <h2><i class="fas fa-bolt"></i> Ações Rápidas</h2>
+</div>
+
+<div class="actions-grid">
+    <a href="{% url 'meus_horarios' %}" class="action-card">
+        <div class="action-icon">
+            <i class="fas fa-clock"></i>
+        </div>
+        <h3>Meus Horários</h3>
+        <p>Visualize todos os seus horários de aula</p>
+        <span class="action-link">
+            Acessar <i class="fas fa-arrow-right"></i>
+        </span>
+    </a>
+    
+    <a href="{% url 'minhas_permutas' %}" class="action-card">
+        <div class="action-icon">
+            <i class="fas fa-exchange-alt"></i>
+        </div>
+        <h3>Minhas Permutas</h3>
+        <p>Acompanhe suas solicitações de permuta</p>
+        <span class="action-link">
+            Acessar <i class="fas fa-arrow-right"></i>
+        </span>
+    </a>
+    
+    <a href="{% url 'permutas_como_substituto' %}" class="action-card">
+        <div class="action-icon">
+            <i class="fas fa-user-friends"></i>
+        </div>
+        <h3>Como Substituto</h3>
+        <p>Permutas onde você é o substituto</p>
+        <span class="action-link">
+            Acessar <i class="fas fa-arrow-right"></i>
+        </span>
+    </a>
+</div>
+
+<div class="next-permutas">
+    <h3><i class="fas fa-calendar-alt"></i> Próximas Permutas</h3>
+    
+    {% if proximas_permutas %}
+        {% for permuta in proximas_permutas %}
+        <div class="permuta-item">
+            <div style="display: flex; align-items: center;">
+                <span class="permuta-date">{{ permuta.data_aula|date:"d/m" }}</span>
+                <div class="permuta-details">
+                    <h4>{{ permuta.horario.disciplina.nome }}</h4>
+                    <p>{{ permuta.horario.turma.codigo_turma }} • {{ permuta.horario.hora_inicio }}h</p>
+                </div>
+            </div>
+            <span class="status-badge {% if permuta.status == 'PENDENTE' %}status-pendente{% else %}status-aprovada{% endif %}">
+                {{ permuta.get_status_display }}
+            </span>
+        </div>
+        {% endfor %}
+        
+        <div class="text-center mt-3">
+            <a href="{% url 'minhas_permutas' %}" class="text-success fw-bold">
+                Ver todas as permutas <i class="fas fa-arrow-right ms-1"></i>
+            </a>
+        </div>
+    {% else %}
+        <p class="text-muted text-center py-4">
+            <i class="fas fa-info-circle me-2"></i>
+            Nenhuma permuta programada.
+        </p>
+    {% endif %}
+</div>
+{% endblock %}

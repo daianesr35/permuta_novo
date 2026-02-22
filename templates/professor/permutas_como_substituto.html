@@ -1,0 +1,285 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Permutas como Substituto - Sistema de Permuta{% endblock %}
+
+{% block extra_css %}
+<style>
+    .substituto-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        padding: 2rem;
+        border-radius: 20px;
+        margin-bottom: 2rem;
+        border-left: 5px solid var(--verde);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+    
+    .btn-confirmar {
+        background: #28a745;
+        color: white;
+        padding: 0.4rem 1rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        border: none;
+    }
+    
+    .btn-confirmar:hover {
+        background: #218838;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 3px 10px rgba(40, 167, 69, 0.3);
+    }
+    
+    .btn-indisponivel {
+        background: #6c757d;
+        color: white;
+        padding: 0.4rem 1rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        opacity: 0.6;
+        cursor: not-allowed;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+    
+    .info-message {
+        font-size: 0.85rem;
+        padding: 0.3rem 1rem;
+        border-radius: 50px;
+        display: inline-block;
+    }
+    
+    .info-aguardando {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .info-reposicao {
+        background: #cce5ff;
+        color: #004085;
+    }
+    
+    .highlight-card {
+        border: 2px solid #ffc107;
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.4); }
+        70% { box-shadow: 0 0 0 10px rgba(255, 193, 7, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="substituto-header">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h2 class="mb-2">
+                <i class="fas fa-user-friends text-success me-2"></i>
+                Permutas como Professor Substituto
+            </h2>
+            <p class="text-muted mb-0">
+                Acompanhe as permutas onde você foi indicado como substituto
+            </p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <span class="professor-badge">
+                <i class="fas fa-chalkboard-teacher me-2"></i>
+                {{ professor.nome }}
+            </span>
+        </div>
+    </div>
+</div>
+
+{% if permutas %}
+    <!-- Cards de Resumo -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card bg-warning bg-opacity-10 border-warning">
+                <div class="card-body">
+                    <h5 class="card-title text-warning">
+                        <i class="fas fa-clock"></i> Aguardando Ação
+                    </h5>
+                    <p class="card-text display-6">
+                        {{ permutas|length }}
+                    </p>
+                    <small>Permutas que precisam de sua atenção</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-success bg-opacity-10 border-success">
+                <div class="card-body">
+                    <h5 class="card-title text-success">
+                        <i class="fas fa-check-circle"></i> Com Reposição
+                    </h5>
+                    <p class="card-text display-6">
+                        {{ permutas_com_reposicao|default:"0" }}
+                    </p>
+                    <small>Permutas com reposição registrada</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-info bg-opacity-10 border-info">
+                <div class="card-body">
+                    <h5 class="card-title text-info">
+                        <i class="fas fa-calendar-alt"></i> Próximas Aulas
+                    </h5>
+                    <p class="card-text display-6">
+                        {{ proximas_permutas|default:"0" }}
+                    </p>
+                    <small>Permutas nos próximos 7 dias</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Versão Desktop -->
+    <div class="table-permutas">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Solicitante</th>
+                    <th>Turma</th>
+                    <th>Disciplina</th>
+                    <th>Data Aula</th>
+                    <th>Status</th>
+                    <th>Reposição</th>
+                    <th>Ação</th>
+                    <th>Detalhes</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in permutas %}
+                <tr class="{% if p.status == 'AGUARDANDO' and p.tem_reposicao %}table-warning{% endif %}">
+                    <td><strong>#{{ p.id }}</strong></td>
+                    <td>{{ p.professor_solicitante.nome }}</td>
+                    <td>{{ p.horario.turma.codigo_turma }}</td>
+                    <td>{{ p.horario.disciplina.nome }}</td>
+                    <td>
+                        <strong>{{ p.data_aula|date:"d/m/Y" }}</strong>
+                        {% if p.data_aula < hoje %}
+                            <br><small class="text-danger">(Atrasada)</small>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="badge-status 
+                            {% if p.status == 'AGUARDANDO' %}status-aguardando
+                            {% elif p.status == 'APROVADA' %}status-aprovada
+                            {% else %}status-cancelada{% endif %}">
+                            {{ p.get_status_display }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if p.tem_reposicao %}
+                            <span class="info-message info-reposicao">
+                                <i class="fas fa-check"></i>
+                                {{ p.reposicao.data_reposicao|date:"d/m/Y" }}
+                            </span>
+                        {% else %}
+                            <span class="info-message info-aguardando">
+                                <i class="fas fa-clock"></i>
+                                Pendente
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if p.status == "CANCELADA" %}
+                            <span class="btn-indisponivel">
+                                <i class="fas fa-ban"></i> Cancelada
+                            </span>
+                        {% elif p.status == "APROVADA" %}
+                            <span class="btn-indisponivel" style="background: #28a745;">
+                                <i class="fas fa-check"></i> Aprovada
+                            </span>
+                        {% elif p.tem_reposicao %}
+                            <a href="{% url 'confirmar_permuta_substituto' p.id %}" class="btn-confirmar">
+                                <i class="fas fa-check-circle"></i> Confirmar
+                            </a>
+                        {% else %}
+                            <span class="btn-indisponivel">
+                                <i class="fas fa-hourglass-half"></i> Aguardando
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'detalhe_permuta' p.id %}" class="btn-acao btn-detalhes">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Versão Mobile -->
+    <div class="permutas-mobile">
+        {% for p in permutas %}
+        <div class="permuta-card-mobile {% if p.tem_reposicao and p.status == 'AGUARDANDO' %}highlight-card{% endif %}">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <h5 class="mb-0">Permuta #{{ p.id }}</h5>
+                <span class="badge-status 
+                    {% if p.status == 'AGUARDANDO' %}status-aguardando
+                    {% elif p.status == 'APROVADA' %}status-aprovada
+                    {% else %}status-cancelada{% endif %}">
+                    {{ p.get_status_display }}
+                </span>
+            </div>
+            
+            <p class="mb-1"><i class="fas fa-user-tie"></i> <strong>Solicitante:</strong> {{ p.professor_solicitante.nome }}</p>
+            <p class="mb-1"><i class="fas fa-calendar-alt"></i> <strong>Data Aula:</strong> {{ p.data_aula|date:"d/m/Y" }}</p>
+            <p class="mb-1"><i class="fas fa-users"></i> <strong>Turma:</strong> {{ p.horario.turma.codigo_turma }}</p>
+            <p class="mb-1"><i class="fas fa-book"></i> <strong>Disciplina:</strong> {{ p.horario.disciplina.nome }}</p>
+            
+            <div class="mt-2 mb-2">
+                {% if p.tem_reposicao %}
+                    <span class="info-message info-reposicao">
+                        <i class="fas fa-check-circle"></i>
+                        Reposição: {{ p.reposicao.data_reposicao|date:"d/m/Y" }}
+                    </span>
+                {% else %}
+                    <span class="info-message info-aguardando">
+                        <i class="fas fa-clock"></i>
+                        Aguardando reposição
+                    </span>
+                {% endif %}
+            </div>
+            
+            <div class="d-flex gap-2 mt-3">
+                {% if p.status != "CANCELADA" and p.status != "APROVADA" and p.tem_reposicao %}
+                    <a href="{% url 'confirmar_permuta_substituto' p.id %}" class="btn-confirmar flex-fill text-center">
+                        <i class="fas fa-check-circle"></i> Confirmar
+                    </a>
+                {% endif %}
+                <a href="{% url 'detalhe_permuta' p.id %}" class="btn-acao btn-detalhes flex-fill text-center">
+                    <i class="fas fa-eye"></i> Detalhes
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+<div class="empty-state-horarios">
+    <i class="fas fa-user-friends"></i>
+    <h4>Nenhuma permuta como substituto</h4>
+    <p class="text-muted mb-4">
+        Você não foi indicado como professor substituto em nenhuma permuta ainda.
+    </p>
+    <a href="{% url 'home' %}" class="btn-solicitar">
+        <i class="fas fa-home me-2"></i>
+        Voltar ao Início
+    </a>
+</div>
+{% endif %}
+{% endblock %}

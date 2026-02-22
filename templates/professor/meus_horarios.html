@@ -1,0 +1,282 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Meus Horários - Sistema de Permuta{% endblock %}
+
+{% block extra_css %}
+<style>
+    .horarios-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        padding: 2rem;
+        border-radius: 20px;
+        margin-bottom: 2rem;
+        border-left: 5px solid var(--verde);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+    
+    .professor-badge {
+        background: linear-gradient(135deg, var(--verde) 0%, var(--vermelho) 100%);
+        color: white;
+        padding: 0.8rem 2rem;
+        border-radius: 50px;
+        display: inline-block;
+        font-weight: 600;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .table-horarios {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    }
+    
+    .table-horarios thead {
+        background: linear-gradient(135deg, var(--verde) 0%, var(--vermelho) 100%);
+        color: white;
+    }
+    
+    .table-horarios thead th {
+        padding: 1.2rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.9rem;
+        border: none;
+    }
+    
+    .table-horarios thead th:first-child {
+        border-radius: 15px 0 0 0;
+    }
+    
+    .table-horarios thead th:last-child {
+        border-radius: 0 15px 0 0;
+    }
+    
+    .table-horarios tbody tr {
+        transition: all 0.3s ease;
+        border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .table-horarios tbody tr:hover {
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        transform: scale(1.01);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .table-horarios td {
+        padding: 1.2rem;
+        vertical-align: middle;
+    }
+    
+    .dia-semana {
+        display: inline-block;
+        padding: 0.3rem 1rem;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    
+    .dia-segunda { background: #cfe2ff; color: #0a58ca; }
+    .dia-terca { background: #fff3cd; color: #856404; }
+    .dia-quarta { background: #d1e7dd; color: #0f5132; }
+    .dia-quinta { background: #f8d7da; color: #842029; }
+    .dia-sexta { background: #e2d9f3; color: #6610f2; }
+    .dia-sabado { background: #d3d3d3; color: #495057; }
+    
+    .btn-solicitar {
+        background: linear-gradient(135deg, var(--verde) 0%, var(--vermelho) 100%);
+        color: white;
+        padding: 0.6rem 1.5rem;
+        border-radius: 50px;
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: none;
+        cursor: pointer;
+    }
+    
+    .btn-solicitar:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        color: white;
+    }
+    
+    .empty-state-horarios {
+        text-align: center;
+        padding: 4rem;
+        background: #f8f9fa;
+        border-radius: 20px;
+    }
+    
+    .empty-state-horarios i {
+        font-size: 5rem;
+        background: linear-gradient(135deg, var(--verde) 0%, var(--vermelho) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 1rem;
+    }
+    
+    .horario-card-mobile {
+        display: none;
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+        border-left: 4px solid var(--verde);
+    }
+    
+    @media (max-width: 768px) {
+        .table-horarios {
+            display: none;
+        }
+        
+        .horario-card-mobile {
+            display: block;
+        }
+        
+        .horario-card-mobile .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .horario-card-mobile .card-body p {
+            margin: 0.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .horario-card-mobile i {
+            width: 25px;
+            color: var(--verde);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="horarios-header">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h2 class="mb-2">
+                <i class="fas fa-clock text-success me-2"></i>
+                Meus Horários de Aula
+            </h2>
+            <p class="text-muted mb-0">
+                Visualize todos os seus horários e solicite permutas quando necessário
+            </p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <span class="professor-badge">
+                <i class="fas fa-chalkboard-teacher me-2"></i>
+                {{ professor.nome }}
+            </span>
+        </div>
+    </div>
+</div>
+
+{% if horarios %}
+    <!-- Versão Desktop -->
+    <div class="table-horarios">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Turma</th>
+                    <th>Disciplina</th>
+                    <th>Dia da Semana</th>
+                    <th>Horário</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for h in horarios %}
+                <tr>
+                    <td>
+                        <strong>{{ h.turma.codigo_turma }}</strong>
+                        {% if h.turma.descricao %}
+                            <br><small class="text-muted">{{ h.turma.descricao|truncatechars:30 }}</small>
+                        {% endif %}
+                    </td>
+                    <td>{{ h.disciplina.nome }}</td>
+                    <td>
+                        <span class="dia-semana 
+                            {% if h.dia_semana == 2 %}dia-segunda
+                            {% elif h.dia_semana == 3 %}dia-terca
+                            {% elif h.dia_semana == 4 %}dia-quarta
+                            {% elif h.dia_semana == 5 %}dia-quinta
+                            {% elif h.dia_semana == 6 %}dia-sexta
+                            {% else %}dia-sabado{% endif %}">
+                            {{ h.get_dia_semana_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <i class="far fa-clock text-muted me-1"></i>
+                        {{ h.hora_inicio|time:"H:i" }} - {{ h.hora_fim|time:"H:i" }}
+                    </td>
+                    <td>
+                        <a href="{% url 'solicitar_permuta' h.id %}" class="btn-solicitar">
+                            <i class="fas fa-exchange-alt"></i>
+                            Solicitar Permuta
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Versão Mobile -->
+    <div class="horarios-mobile">
+        {% for h in horarios %}
+        <div class="horario-card-mobile">
+            <div class="card-header">
+                <h5 class="mb-0">{{ h.turma.codigo_turma }}</h5>
+                <span class="dia-semana 
+                    {% if h.dia_semana == 2 %}dia-segunda
+                    {% elif h.dia_semana == 3 %}dia-terca
+                    {% elif h.dia_semana == 4 %}dia-quarta
+                    {% elif h.dia_semana == 5 %}dia-quinta
+                    {% elif h.dia_semana == 6 %}dia-sexta
+                    {% else %}dia-sabado{% endif %}">
+                    {{ h.get_dia_semana_display }}
+                </span>
+            </div>
+            <div class="card-body">
+                <p><i class="fas fa-book"></i> <strong>Disciplina:</strong> {{ h.disciplina.nome }}</p>
+                <p><i class="far fa-clock"></i> <strong>Horário:</strong> {{ h.hora_inicio|time:"H:i" }} - {{ h.hora_fim|time:"H:i" }}</p>
+                {% if h.turma.descricao %}
+                <p><i class="fas fa-info-circle"></i> <small>{{ h.turma.descricao|truncatechars:50 }}</small></p>
+                {% endif %}
+                <div class="text-center mt-3">
+                    <a href="{% url 'solicitar_permuta' h.id %}" class="btn-solicitar">
+                        <i class="fas fa-exchange-alt"></i>
+                        Solicitar Permuta
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+<div class="empty-state-horarios">
+    <i class="fas fa-calendar-times"></i>
+    <h4>Nenhum horário cadastrado</h4>
+    <p class="text-muted mb-4">
+        Você ainda não possui horários cadastrados na grade.
+        <br>Entre em contato com a coordenação para regularizar sua situação.
+    </p>
+    <a href="{% url 'home' %}" class="btn-solicitar">
+        <i class="fas fa-home me-2"></i>
+        Voltar ao Início
+    </a>
+</div>
+{% endif %}
+{% endblock %}

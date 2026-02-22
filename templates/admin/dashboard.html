@@ -1,0 +1,424 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Dashboard Administrativo - Sistema de Permuta{% endblock %}
+
+{% block extra_css %}
+<style>
+    .admin-header {
+        background: linear-gradient(135deg, var(--vermelho) 0%, #c0392b 100%);
+        color: white;
+        border-radius: 30px;
+        padding: 2.5rem;
+        margin-bottom: 2.5rem;
+        box-shadow: 0 15px 35px rgba(192, 57, 43, 0.2);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .admin-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 300px;
+        height: 300px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 50%;
+    }
+    
+    .admin-avatar {
+        width: 100px;
+        height: 100px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        backdrop-filter: blur(10px);
+        border: 3px solid rgba(255,255,255,0.3);
+    }
+    
+    .admin-info h1 {
+        font-size: 2.2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .admin-badge {
+        background: rgba(255,255,255,0.2);
+        padding: 0.5rem 1.5rem;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        display: inline-block;
+        backdrop-filter: blur(5px);
+    }
+    
+    .admin-stats {
+        display: flex;
+        gap: 2rem;
+        margin-top: 1.5rem;
+        flex-wrap: wrap;
+    }
+    
+    .stat-item {
+        text-align: center;
+        min-width: 100px;
+    }
+    
+    .stat-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        line-height: 1;
+    }
+    
+    .stat-label {
+        font-size: 0.85rem;
+        opacity: 0.9;
+        text-transform: uppercase;
+    }
+    
+    .section-title {
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 3px solid var(--vermelho);
+    }
+    
+    .section-title h2 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #2c3e50;
+    }
+    
+    .section-title h2 i {
+        color: var(--vermelho);
+        margin-right: 10px;
+    }
+    
+    .admin-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+    
+    .admin-card {
+        background: white;
+        border-radius: 20px;
+        padding: 1.5rem;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+        text-decoration: none;
+        color: inherit;
+        border: 2px solid transparent;
+    }
+    
+    .admin-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(192, 57, 43, 0.1);
+        border-color: var(--vermelho);
+    }
+    
+    .admin-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 2rem;
+    }
+    
+    .admin-icon.pendentes { background: #fff3cd; color: #ffc107; }
+    .admin-icon.professores { background: #d4edda; color: #28a745; }
+    .admin-icon.turmas { background: #cce5ff; color: #007bff; }
+    .admin-icon.disciplinas { background: #e2d9f3; color: #6f42c1; }
+    .admin-icon.horarios { background: #d1ecf1; color: #17a2b8; }
+    .admin-icon.relatorios { background: #f8d7da; color: #dc3545; }
+    .admin-icon.estatisticas { background: #d4edda; color: #28a745; }
+    .admin-icon.admin { background: #343a40; color: white; }
+    
+    .admin-card .count {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--vermelho);
+        margin-bottom: 0.5rem;
+    }
+    
+    .admin-card h3 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .admin-card p {
+        color: #7f8c8d;
+        font-size: 0.85rem;
+        margin-bottom: 1rem;
+    }
+    
+    .admin-link {
+        color: var(--vermelho);
+        font-size: 0.9rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+    
+    .admin-card:hover .admin-link {
+        gap: 10px;
+    }
+    
+    .alerts-section {
+        background: #fff3cd;
+        border-radius: 20px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border-left: 5px solid #ffc107;
+    }
+    
+    .alerts-section h3 {
+        color: #856404;
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+    
+    .alert-item {
+        background: white;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 0.8rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    
+    .btn-alert {
+        background: #ffc107;
+        color: #856404;
+        padding: 0.4rem 1rem;
+        border-radius: 50px;
+        text-decoration: none;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    
+    .btn-alert:hover {
+        background: #e0a800;
+        color: white;
+    }
+    
+    @media (max-width: 1024px) {
+        .admin-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .admin-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .admin-info h1 {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+    <div class="row align-items-center">
+        <div class="col-auto">
+            <div class="admin-avatar">
+                <i class="fas fa-user-tie"></i>
+            </div>
+        </div>
+        <div class="col admin-info">
+            <h1>Painel Administrativo</h1>
+            <div class="admin-badge">
+                <i class="fas fa-shield-alt me-2"></i>
+                Coordenação • {{ usuario.get_full_name|default:usuario.username }}
+            </div>
+            
+            <div class="admin-stats">
+                <div class="stat-item">
+                    <div class="stat-value">{{ total_professores }}</div>
+                    <div class="stat-label">Professores</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">{{ total_turmas }}</div>
+                    <div class="stat-label">Turmas</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">{{ total_disciplinas }}</div>
+                    <div class="stat-label">Disciplinas</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">{{ total_horarios }}</div>
+                    <div class="stat-label">Horários</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">{{ total_permutas }}</div>
+                    <div class="stat-label">Permutas</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if permutas_sem_reposicao %}
+<div class="alerts-section">
+    <h3><i class="fas fa-exclamation-triangle me-2"></i> Alertas - Permutas sem Reposição</h3>
+    {% for permuta in permutas_sem_reposicao %}
+    <div class="alert-item">
+        <div>
+            <strong>#{{ permuta.id }}</strong> - {{ permuta.professor_solicitante.nome }}
+            <br>
+            <small>Aula: {{ permuta.data_aula|date:"d/m/Y" }} | Substituto: {{ permuta.professor_substituto.nome }}</small>
+        </div>
+        <a href="{% url 'detalhe_permuta' permuta.id %}" class="btn-alert">
+            Ver <i class="fas fa-arrow-right ms-1"></i>
+        </a>
+    </div>
+    {% endfor %}
+    
+    <div class="text-center mt-3">
+        <a href="{% url 'permutas_pendentes' %}" class="text-warning fw-bold">
+            Ver todas as pendentes <i class="fas fa-arrow-right ms-1"></i>
+        </a>
+    </div>
+</div>
+{% endif %}
+
+<div class="section-title">
+    <h2><i class="fas fa-cog"></i> Gestão do Sistema</h2>
+</div>
+
+<div class="admin-grid">
+    <a href="{% url 'permutas_pendentes' %}" class="admin-card">
+        <div class="admin-icon pendentes">
+            <i class="fas fa-clock"></i>
+        </div>
+        <div class="count">{{ permutas_pendentes }}</div>
+        <h3>Permutas Pendentes</h3>
+        <p>Aguardando reposição</p>
+        <span class="admin-link">Gerenciar <i class="fas fa-arrow-right"></i></span>
+    </a>
+    
+    <a href="{% url 'admin:accounts_professor_changelist' %}" class="admin-card">
+        <div class="admin-icon professores">
+            <i class="fas fa-chalkboard-teacher"></i>
+        </div>
+        <div class="count">{{ total_professores }}</div>
+        <h3>Professores</h3>
+        <p>Cadastro e permissões</p>
+        <span class="admin-link">Gerenciar <i class="fas fa-arrow-right"></i></span>
+    </a>
+    
+    <a href="{% url 'admin:cadastros_turma_changelist' %}" class="admin-card">
+        <div class="admin-icon turmas">
+            <i class="fas fa-users"></i>
+        </div>
+        <div class="count">{{ total_turmas }}</div>
+        <h3>Turmas</h3>
+        <p>Gerenciar turmas</p>
+        <span class="admin-link">Gerenciar <i class="fas fa-arrow-right"></i></span>
+    </a>
+    
+    <a href="{% url 'admin:cadastros_disciplina_changelist' %}" class="admin-card">
+        <div class="admin-icon disciplinas">
+            <i class="fas fa-book"></i>
+        </div>
+        <div class="count">{{ total_disciplinas }}</div>
+        <h3>Disciplinas</h3>
+        <p>Gerenciar disciplinas</p>
+        <span class="admin-link">Gerenciar <i class="fas fa-arrow-right"></i></span>
+    </a>
+    
+    <a href="{% url 'admin:cadastros_horarioaula_changelist' %}" class="admin-card">
+        <div class="admin-icon horarios">
+            <i class="fas fa-clock"></i>
+        </div>
+        <div class="count">{{ total_horarios }}</div>
+        <h3>Horários</h3>
+        <p>Gerenciar horários</p>
+        <span class="admin-link">Gerenciar <i class="fas fa-arrow-right"></i></span>
+    </a>
+    
+    <a href="{% url 'relatorio_permutas_excel' %}" class="admin-card">
+        <div class="admin-icon relatorios">
+            <i class="fas fa-file-excel"></i>
+        </div>
+        <div class="count">Excel</div>
+        <h3>Relatórios</h3>
+        <p>Exportar dados</p>
+        <span class="admin-link">Baixar <i class="fas fa-download"></i></span>
+    </a>
+    
+    <a href="{% url 'dashboard_estatisticas' %}" class="admin-card">
+        <div class="admin-icon estatisticas">
+            <i class="fas fa-chart-line"></i>
+        </div>
+        <div class="count">Gráficos</div>
+        <h3>Estatísticas</h3>
+        <p>Dashboard analítico</p>
+        <span class="admin-link">Visualizar <i class="fas fa-arrow-right"></i></span>
+    </a>
+    
+    <a href="{% url 'admin:index' %}" class="admin-card">
+        <div class="admin-icon admin">
+            <i class="fas fa-cogs"></i>
+        </div>
+        <div class="count">Admin</div>
+        <h3>Django Admin</h3>
+        <p>Painel completo</p>
+        <span class="admin-link">Acessar <i class="fas fa-arrow-right"></i></span>
+    </a>
+</div>
+
+<!-- Top Rankings -->
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="mb-0"><i class="fas fa-trophy text-warning me-2"></i>Top 5 Professores</h5>
+            </div>
+            <div class="card-body">
+                {% for prof in top_professores %}
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span>{{ forloop.counter }}. {{ prof.nome }}</span>
+                    <span class="badge bg-success">{{ prof.total_permutas }} permutas</span>
+                </div>
+                {% empty %}
+                <p class="text-muted">Nenhum dado disponível</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="mb-0"><i class="fas fa-book text-info me-2"></i>Top 5 Disciplinas</h5>
+            </div>
+            <div class="card-body">
+                {% for disc in top_disciplinas %}
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span>{{ forloop.counter }}. {{ disc.nome }}</span>
+                    <span class="badge bg-info">{{ disc.total_permutas }} permutas</span>
+                </div>
+                {% empty %}
+                <p class="text-muted">Nenhum dado disponível</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

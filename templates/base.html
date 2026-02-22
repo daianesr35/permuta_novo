@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Sistema de Permuta de Aulas{% endblock %}</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --verde: #28a745;
+            --verde-escuro: #1e7e34;
+            --verde-claro: #d4edda;
+            --vermelho: #dc3545;
+            --vermelho-escuro: #bd2130;
+            --vermelho-claro: #f8d7da;
+            --cinza: #6c757d;
+            --cinza-claro: #f8f9fa;
+            --escuro: #343a40;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Header estilizado */
+        .custom-header {
+            background: linear-gradient(135deg, var(--verde) 0%, var(--vermelho) 100%);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .header-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .header-title i {
+            margin-right: 10px;
+        }
+        
+        .user-info {
+            background: rgba(255,255,255,0.2);
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            display: inline-block;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .user-info i {
+            margin-right: 5px;
+        }
+        
+        /* Navegação */
+        .nav-custom {
+            background: white;
+            padding: 0.8rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+        
+        .nav-custom a {
+            color: var(--escuro);
+            text-decoration: none;
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin: 0 0.2rem;
+        }
+        
+        .nav-custom a:hover {
+            background: linear-gradient(135deg, var(--verde-claro) 0%, var(--vermelho-claro) 100%);
+            color: var(--escuro);
+        }
+        
+        .nav-custom a i {
+            margin-right: 5px;
+        }
+        
+        .nav-custom a.active {
+            background: linear-gradient(135deg, var(--verde) 0%, var(--vermelho) 100%);
+            color: white;
+        }
+        
+        .nav-divider {
+            color: var(--cinza);
+            margin: 0 0.5rem;
+        }
+        
+        .logout-btn {
+            background: transparent;
+            border: 2px solid var(--vermelho);
+            color: var(--vermelho) !important;
+        }
+        
+        .logout-btn:hover {
+            background: var(--vermelho) !important;
+            color: white !important;
+        }
+        
+        /* Mensagens */
+        .messages-container {
+            max-width: 800px;
+            margin: 1rem auto;
+        }
+        
+        .alert-custom {
+            border-radius: 50px;
+            border: none;
+            padding: 1rem 1.5rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            animation: slideDown 0.5s ease;
+        }
+        
+        @keyframes slideDown {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .alert-success {
+            background: linear-gradient(135deg, var(--verde-claro) 0%, #ffffff 100%);
+            border-left: 5px solid var(--verde);
+            color: var(--verde-escuro);
+        }
+        
+        .alert-error {
+            background: linear-gradient(135deg, var(--vermelho-claro) 0%, #ffffff 100%);
+            border-left: 5px solid var(--vermelho);
+            color: var(--vermelho-escuro);
+        }
+        
+        /* Notificações */
+        .notifications-section {
+            background: linear-gradient(135deg, var(--verde-claro) 0%, var(--vermelho-claro) 100%);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin: 1rem auto;
+            max-width: 800px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+        
+        .notifications-section h3 {
+            color: var(--escuro);
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .notifications-section h3 i {
+            background: linear-gradient(135deg, var(--verde) 0%, var(--vermelho) 100%);
+            color: white;
+            padding: 10px;
+            border-radius: 50%;
+        }
+        
+        .notification-item {
+            background: white;
+            border-radius: 15px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border-left: 4px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .notification-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .notification-item.nao-lida {
+            border-left-color: var(--vermelho);
+            background: linear-gradient(135deg, #fff 0%, var(--vermelho-claro) 100%);
+        }
+        
+        .notification-item.lida {
+            border-left-color: var(--verde);
+            opacity: 0.8;
+        }
+        
+        .notification-link {
+            background: linear-gradient(135deg, var(--verde) 0%, var(--vermelho) 100%);
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .notification-link:hover {
+            background: transparent;
+            border-color: var(--vermelho);
+            color: var(--vermelho);
+        }
+        
+        /* Main content */
+        main {
+            flex: 1;
+            padding: 2rem 0;
+        }
+        
+        /* Footer */
+        .custom-footer {
+            background: linear-gradient(135deg, var(--verde-escuro) 0%, var(--vermelho-escuro) 100%);
+            color: white;
+            padding: 2rem 0 1rem;
+            margin-top: 3rem;
+        }
+        
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .footer-version {
+            background: rgba(255,255,255,0.2);
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+        }
+        
+        /* Botão flutuante (opcional) */
+        .floating-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--verde) 0%, var(--vermelho) 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .floating-btn:hover {
+            transform: scale(1.1) rotate(90deg);
+            color: white;
+        }
+        
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .header-title {
+                font-size: 1.3rem;
+            }
+            
+            .nav-custom a {
+                display: inline-block;
+                margin: 0.2rem;
+                font-size: 0.9rem;
+                padding: 0.4rem 1rem;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .user-info {
+                margin-top: 1rem;
+            }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Header -->
+    <header class="custom-header">
+        <div class="container">
+            <div class="d-flex flex-wrap align-items-center justify-content-between">
+                <h1 class="header-title">
+                    <i class="fas fa-exchange-alt"></i>
+                    Sistema de Permuta de Aulas
+                </h1>
+                
+                {% if user.is_authenticated %}
+                    <div class="user-info">
+                        <i class="fas fa-user-circle"></i>
+                        <strong>{{ user.get_full_name|default:user.username }}</strong>
+                        {% if user.is_staff %}
+                            <span class="badge bg-light text-dark ms-2">Admin</span>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <!-- Navegação -->
+    {% if user.is_authenticated %}
+    <nav class="nav-custom">
+        <div class="container">
+            <div class="d-flex flex-wrap align-items-center justify-content-center">
+                <a href="{% url 'home' %}" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+                    <i class="fas fa-home"></i> Início
+                </a>
+                <span class="nav-divider">|</span>
+                
+                <a href="{% url 'meus_horarios' %}" class="{% if request.resolver_match.url_name == 'meus_horarios' %}active{% endif %}">
+                    <i class="fas fa-clock"></i> Meus Horários
+                </a>
+                <span class="nav-divider">|</span>
+                
+                <a href="{% url 'minhas_permutas' %}" class="{% if request.resolver_match.url_name == 'minhas_permutas' %}active{% endif %}">
+                    <i class="fas fa-exchange-alt"></i> Minhas Permutas
+                </a>
+                <span class="nav-divider">|</span>
+                
+                <a href="{% url 'permutas_como_substituto' %}" class="{% if request.resolver_match.url_name == 'permutas_como_substituto' %}active{% endif %}">
+                    <i class="fas fa-user-friends"></i> Como Substituto
+                </a>
+                
+                {% if user.is_staff %}
+                    <span class="nav-divider">|</span>
+                    <a href="{% url 'permutas_pendentes' %}" class="{% if request.resolver_match.url_name == 'permutas_pendentes' %}active{% endif %}">
+                        <i class="fas fa-clock"></i> Pendentes
+                    </a>
+                    <span class="nav-divider">|</span>
+                    <a href="/admin/">
+                        <i class="fas fa-cog"></i> Admin
+                    </a>
+                {% endif %}
+                
+                <span class="nav-divider">|</span>
+                <a href="{% url 'logout' %}" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Sair
+                </a>
+            </div>
+        </div>
+    </nav>
+    {% else %}
+    <nav class="nav-custom">
+        <div class="container text-center">
+            <a href="{% url 'login' %}" class="btn" style="background: linear-gradient(135deg, var(--verde) 0%, var(--vermelho) 100%); color: white; padding: 0.5rem 2rem; border-radius: 50px;">
+                <i class="fas fa-sign-in-alt"></i> Entrar no Sistema
+            </a>
+        </div>
+    </nav>
+    {% endif %}
+
+    <!-- Container principal -->
+    <div class="container">
+        <!-- MENSAGENS -->
+        {% if messages %}
+            <div class="messages-container">
+                {% for message in messages %}
+                    <div class="alert alert-custom {% if message.tags == 'success' %}alert-success{% elif message.tags == 'error' %}alert-error{% endif %} alert-dismissible fade show" role="alert">
+                        <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% else %}fa-info-circle{% endif %} me-2"></i>
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- NOTIFICAÇÕES -->
+        {% if user.is_authenticated and notificacoes_nao_lidas %}
+            <section class="notifications-section">
+                <h3>
+                    <i class="fas fa-bell"></i>
+                    Notificações <span class="badge bg-danger ms-2">{{ notificacoes_nao_lidas|length }}</span>
+                </h3>
+                <div>
+                    {% for notif in notificacoes_nao_lidas %}
+                        <div class="notification-item nao-lida">
+                            <div>
+                                <i class="fas fa-envelope text-danger me-2"></i>
+                                {{ notif.mensagem }}
+                                <small class="text-muted ms-2">{{ notif.criada_em|timesince }} atrás</small>
+                            </div>
+                            <a href="{% url 'ler_notificacao' notif.id %}" class="notification-link">
+                                <i class="fas fa-eye"></i> Ver
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+        {% endif %}
+    </div>
+
+    <!-- Conteúdo principal -->
+    <main>
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="custom-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div>
+                    <i class="fas fa-exchange-alt me-2"></i>
+                    <strong>Sistema de Permuta de Aulas</strong>
+                </div>
+                <div class="footer-version">
+                    <i class="fas fa-code-branch"></i> Versão 1.0.0
+                </div>
+                <div>
+                    <small>&copy; {% now "Y" %} - Todos os direitos reservados</small>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Botão flutuante de ajuda (opcional) -->
+    <a href="#" class="floating-btn" title="Ajuda">
+        <i class="fas fa-question"></i>
+    </a>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <script>
+        // Auto-dismiss alerts after 5 seconds
+        setTimeout(function() {
+            document.querySelectorAll('.alert').forEach(function(alert) {
+                var bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+        
+        // Marcar link ativo na navegação
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPath = window.location.pathname;
+            document.querySelectorAll('.nav-custom a').forEach(link => {
+                if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('active');
+                }
+            });
+        });
+        
+        // Tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

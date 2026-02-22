@@ -1,0 +1,42 @@
+@"
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Professor não cadastrado{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-lg text-center p-5">
+                <div class="mb-4">
+                    <i class="fas fa-chalkboard-teacher fa-5x text-danger"></i>
+                </div>
+                <h2 class="mb-3 text-danger">Professor não cadastrado</h2>
+                <p class="lead text-muted mb-4">
+                    Olá, <strong>{{ usuario.username }}</strong>!
+                </p>
+                <p class="mb-4">
+                    Seu usuário ainda não está vinculado a um cadastro de <strong>Professor</strong> no sistema.
+                    Para acessar as funcionalidades de permuta, você precisa ter um perfil de professor associado.
+                </p>
+                <div class="alert alert-info text-start">
+                    <h5><i class="fas fa-info-circle me-2"></i>Próximos passos:</h5>
+                    <ol class="mb-0">
+                        <li>Entre em contato com a coordenação</li>
+                        <li>Solicite a criação do seu registro de Professor</li>
+                        <li>Peça para associarem seu usuário ao cadastro</li>
+                        <li>Após a liberação, faça login novamente</li>
+                    </ol>
+                </div>
+                <div class="mt-4">
+                    <a href="{% url 'home' %}" class="btn btn-success rounded-pill px-5">
+                        <i class="fas fa-home me-2"></i>Voltar para Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+"@ | Out-File -FilePath C:\Users\Lanny\Documents\permuta_novo-main\permuta_novo-main\templates\sem_professor.html -Encoding UTF8

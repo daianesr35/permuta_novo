@@ -1,0 +1,303 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Detalhes da Permuta - Sistema de Permuta{% endblock %}
+
+{% block extra_css %}
+<style>
+    .detail-header {
+        background: linear-gradient(135deg, var(--verde) 0%, var(--vermelho) 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 30px 30px 30px 30px;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    .detail-card {
+        background: white;
+        border-radius: 20px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        border-left: 5px solid transparent;
+        transition: all 0.3s ease;
+    }
+    
+    .detail-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    .card-solicitante {
+        border-left-color: var(--verde);
+    }
+    
+    .card-substituto {
+        border-left-color: var(--vermelho);
+    }
+    
+    .card-horario {
+        border-left: 5px solid linear-gradient(135deg, var(--verde) 0%, var(--vermelho) 100%);
+    }
+    
+    .info-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .info-list li {
+        padding: 0.8rem 0;
+        border-bottom: 1px solid #e9ecef;
+        display: flex;
+        align-items: center;
+    }
+    
+    .info-list li:last-child {
+        border-bottom: none;
+    }
+    
+    .info-list i {
+        width: 30px;
+        font-size: 1.2rem;
+        background: linear-gradient(135deg, var(--verde) 0%, var(--vermelho) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    
+    .status-badge-large {
+        display: inline-block;
+        padding: 0.5rem 2rem;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+    
+    .status-aprovada {
+        background: #d4edda;
+        color: #155724;
+        border-left: 5px solid #28a745;
+    }
+    
+    .status-pendente {
+        background: #fff3cd;
+        color: #856404;
+        border-left: 5px solid #ffc107;
+    }
+    
+    .status-cancelada {
+        background: #f8d7da;
+        color: #721c24;
+        border-left: 5px solid #dc3545;
+    }
+    
+    .motivo-box {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 15px;
+        font-style: italic;
+        position: relative;
+    }
+    
+    .motivo-box::before {
+        content: '"';
+        font-size: 4rem;
+        position: absolute;
+        top: -10px;
+        left: 10px;
+        opacity: 0.2;
+        background: linear-gradient(135deg, var(--verde) 0%, var(--vermelho) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    
+    .action-buttons-detail {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+    
+    .btn-pdf {
+        background: linear-gradient(135deg, var(--verde) 0%, var(--vermelho) 100%);
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .btn-pdf:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        color: white;
+    }
+    
+    .btn-voltar {
+        background: transparent;
+        color: var(--verde);
+        border: 2px solid var(--verde);
+        padding: 1rem 2rem;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-voltar:hover {
+        background: var(--verde);
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="detail-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <h2 class="mb-0">
+            <i class="fas fa-file-alt me-2"></i>
+            Detalhes da Permuta #{{ permuta.id }}
+        </h2>
+        <span class="status-badge-large 
+            {% if permuta.status == 'APROVADA' %}status-aprovada
+            {% elif permuta.status == 'CANCELADA' %}status-cancelada
+            {% else %}status-pendente{% endif %}">
+            {{ permuta.get_status_display }}
+        </span>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="detail-card card-solicitante">
+            <h4 class="mb-3">
+                <i class="fas fa-user-tie text-success me-2"></i>
+                Professor Solicitante
+            </h4>
+            <ul class="info-list">
+                <li><i class="fas fa-user"></i> <strong>Nome:</strong> {{ permuta.professor_solicitante.nome }}</li>
+                <li><i class="fas fa-id-card"></i> <strong>Matrícula:</strong> {{ permuta.professor_solicitante.matricula_siape }}</li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="detail-card card-substituto">
+            <h4 class="mb-3">
+                <i class="fas fa-user-graduate text-danger me-2"></i>
+                Professor Substituto
+            </h4>
+            <ul class="info-list">
+                <li><i class="fas fa-user"></i> <strong>Nome:</strong> {{ permuta.professor_substituto.nome }}</li>
+                <li><i class="fas fa-id-card"></i> <strong>Matrícula:</strong> {{ permuta.professor_substituto.matricula_siape }}</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="detail-card">
+    <h4 class="mb-3">
+        <i class="fas fa-clock text-primary me-2"></i>
+        Horário e Aula
+    </h4>
+    <div class="row">
+        <div class="col-md-6">
+            <ul class="info-list">
+                <li><i class="fas fa-users"></i> <strong>Turma:</strong> {{ permuta.horario.turma.codigo_turma }}</li>
+                <li><i class="fas fa-book"></i> <strong>Disciplina:</strong> {{ permuta.horario.disciplina.nome }}</li>
+                <li><i class="fas fa-calendar-day"></i> <strong>Dia:</strong> {{ permuta.horario.get_dia_semana_display }}</li>
+            </ul>
+        </div>
+        <div class="col-md-6">
+            <ul class="info-list">
+                <li><i class="fas fa-clock"></i> <strong>Horário:</strong> {{ permuta.horario.hora_inicio }} - {{ permuta.horario.hora_fim }}</li>
+                <li><i class="fas fa-calendar-alt"></i> <strong>Data da Aula:</strong> {{ permuta.data_aula|date:"d/m/Y" }}</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="detail-card">
+    <h4 class="mb-3">
+        <i class="fas fa-info-circle text-info me-2"></i>
+        Situação da Permuta
+    </h4>
+    <div class="row">
+        <div class="col-md-4">
+            <ul class="info-list">
+                <li><i class="fas fa-calendar-plus"></i> <strong>Solicitação:</strong> {{ permuta.data_solicitacao|date:"d/m/Y H:i" }}</li>
+            </ul>
+        </div>
+        <div class="col-md-4">
+            <ul class="info-list">
+                <li><i class="fas fa-calendar-check"></i> <strong>Decisão:</strong> 
+                    {% if permuta.data_decisao %}
+                        {{ permuta.data_decisao|date:"d/m/Y H:i" }}
+                    {% else %}
+                        <span class="text-muted">Aguardando</span>
+                    {% endif %}
+                </li>
+            </ul>
+        </div>
+        <div class="col-md-4">
+            <ul class="info-list">
+                <li><i class="fas fa-user-check"></i> <strong>Decidida por:</strong>
+                    {% if permuta.usuario_decisor %}
+                        {{ permuta.usuario_decisor.get_full_name|default:permuta.usuario_decisor.username }}
+                    {% else %}
+                        <span class="text-muted">---</span>
+                    {% endif %}
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="detail-card">
+    <h4 class="mb-3">
+        <i class="fas fa-calendar-week text-warning me-2"></i>
+        Reposição
+    </h4>
+    {% if permuta.tem_reposicao %}
+        <div class="alert alert-success">
+            <i class="fas fa-check-circle me-2"></i>
+            <strong>Data da reposição:</strong> {{ permuta.reposicao.data_reposicao|date:"d/m/Y" }}
+            {% if permuta.reposicao.observacao %}
+                <br><small class="text-muted">{{ permuta.reposicao.observacao }}</small>
+            {% endif %}
+        </div>
+    {% else %}
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            Não há reposição registrada para esta permuta.
+        </div>
+    {% endif %}
+</div>
+
+<div class="detail-card">
+    <h4 class="mb-3">
+        <i class="fas fa-comment-dots text-secondary me-2"></i>
+        Motivo da Permuta
+    </h4>
+    <div class="motivo-box">
+        {{ permuta.motivo }}
+    </div>
+</div>
+
+<div class="action-buttons-detail">
+    <a href="{% url 'minhas_permutas' %}" class="btn-voltar">
+        <i class="fas fa-arrow-left me-2"></i>
+        Voltar para Minhas Permutas
+    </a>
+    <a href="{% url 'comprovante_permuta_pdf' permuta.id %}" target="_blank" class="btn-pdf">
+        <i class="fas fa-file-pdf me-2"></i>
+        Baixar Comprovante em PDF
+    </a>
+</div>
+{% endblock %}

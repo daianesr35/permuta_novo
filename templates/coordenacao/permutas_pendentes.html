@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Permutas Pendentes - Sistema de Permuta{% endblock %}
+
+{% block extra_css %}
+<style>
+    .pendentes-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        padding: 2rem;
+        border-radius: 20px;
+        margin-bottom: 2rem;
+        border-left: 5px solid var(--vermelho);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+    
+    .table-container {
+        background: white;
+        border-radius: 20px;
+        padding: 1.5rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        overflow-x: auto;
+    }
+    
+    .table-custom {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 10px;
+    }
+    
+    .table-custom thead th {
+        background: linear-gradient(135deg, var(--verde) 0%, var(--vermelho) 100%);
+        color: white;
+        font-weight: 600;
+        padding: 1rem;
+        white-space: nowrap;
+    }
+    
+    .table-custom thead th:first-child {
+        border-radius: 10px 0 0 10px;
+    }
+    
+    .table-custom thead th:last-child {
+        border-radius: 0 10px 10px 0;
+    }
+    
+    .table-custom tbody tr {
+        background: #f8f9fa;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+    
+    .table-custom tbody tr:hover {
+        background: white;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transform: scale(1.01);
+    }
+    
+    .table-custom td {
+        padding: 1rem;
+        border: none;
+    }
+    
+    .status-badge {
+        padding: 0.3rem 1rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        display: inline-block;
+    }
+    
+    .status-pendente {
+        background: #fff3cd;
+        color: #856404;
+        border-left: 3px solid #ffc107;
+    }
+    
+    .btn-view {
+        background: linear-gradient(135deg, var(--verde) 0%, var(--vermelho) 100%);
+        color: white;
+        padding: 0.5rem 1.5rem;
+        border-radius: 50px;
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        display: inline-block;
+    }
+    
+    .btn-view:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+        color: white;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 4rem;
+        background: #f8f9fa;
+        border-radius: 20px;
+    }
+    
+    .empty-state i {
+        font-size: 5rem;
+        background: linear-gradient(135deg, var(--verde) 0%, var(--vermelho) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="pendentes-header">
+    <h2 class="mb-2">
+        <i class="fas fa-clock text-danger me-2"></i>
+        Permutas Solicitadas sem Reposição
+    </h2>
+    <p class="text-muted mb-0">
+        Lista de permutas que aguardam registro de reposição
+    </p>
+</div>
+
+{% if permutas %}
+<div class="table-container">
+    <table class="table-custom">
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Solicitação</th>
+                <th>Data Aula</th>
+                <th>Solicitante</th>
+                <th>Substituto</th>
+                <th>Turma</th>
+                <th>Disciplina</th>
+                <th>Status</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in permutas %}
+            <tr>
+                <td><strong>#{{ p.id }}</strong></td>
+                <td>{{ p.data_solicitacao|date:"d/m/Y H:i" }}</td>
+                <td>{{ p.data_aula|date:"d/m/Y" }}</td>
+                <td>{{ p.professor_solicitante.nome }}</td>
+                <td>{{ p.professor_substituto.nome }}</td>
+                <td>{{ p.horario.turma.codigo_turma }}</td>
+                <td>{{ p.horario.disciplina.nome }}</td>
+                <td>
+                    <span class="status-badge status-pendente">
+                        <i class="fas fa-clock me-1"></i>
+                        {{ p.get_status_display }}
+                    </span>
+                </td>
+                <td>
+                    <a href="{% url 'detalhe_permuta' p.id %}" class="btn-view">
+                        <i class="fas fa-eye me-1"></i> Detalhes
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state">
+    <i class="fas fa-check-circle"></i>
+    <h4>Nenhuma permuta pendente</h4>
+    <p class="text-muted">Todas as permutas estão com reposição registrada.</p>
+    <a href="{% url 'home' %}" class="btn-view mt-3">
+        <i class="fas fa-home me-1"></i> Voltar ao Início
+    </a>
+</div>
+{% endif %}
+{% endblock %}

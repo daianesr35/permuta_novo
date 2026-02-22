@@ -1,0 +1,582 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Login - Sistema de Permuta{% endblock %}
+
+{% block extra_css %}
+<style>
+    .login-container {
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    }
+    
+    .login-card {
+        max-width: 500px;
+        width: 100%;
+        background: white;
+        border-radius: 30px;
+        padding: 2.5rem;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        animation: fadeIn 0.5s ease;
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .login-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .login-icon {
+        width: 100px;
+        height: 100px;
+        background: linear-gradient(135deg, var(--verde) 0%, var(--vermelho) 100%);
+        border-radius: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        color: white;
+        font-size: 3rem;
+        box-shadow: 0 10px 20px rgba(40, 167, 69, 0.2);
+    }
+    
+    .login-title {
+        font-size: 2rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--verde) 0%, var(--vermelho) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0.5rem;
+    }
+    
+    .login-subtitle {
+        color: #6c757d;
+        font-size: 1rem;
+    }
+    
+    /* Seletor de tipo de usuário */
+    .user-type-selector {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        padding: 0.5rem;
+        background: #f8f9fa;
+        border-radius: 60px;
+    }
+    
+    .user-type-option {
+        flex: 1;
+        text-align: center;
+        padding: 1rem;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 600;
+        border: 2px solid transparent;
+    }
+    
+    .user-type-option i {
+        margin-right: 8px;
+        font-size: 1.2rem;
+    }
+    
+    .user-type-option.admin {
+        color: var(--vermelho);
+    }
+    
+    .user-type-option.professor {
+        color: var(--verde);
+    }
+    
+    .user-type-option.active {
+        background: white;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        border-color: currentColor;
+    }
+    
+    .user-type-option.admin.active {
+        background: linear-gradient(135deg, #fff 0%, #fff5f5 100%);
+        border-color: var(--vermelho);
+    }
+    
+    .user-type-option.professor.active {
+        background: linear-gradient(135deg, #fff 0%, #f0fff4 100%);
+        border-color: var(--verde);
+    }
+    
+    /* Formulário */
+    .login-form {
+        margin-bottom: 2rem;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #495057;
+        font-size: 0.95rem;
+    }
+    
+    .input-group {
+        position: relative;
+    }
+    
+    .input-icon {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #adb5bd;
+        z-index: 10;
+        transition: color 0.3s ease;
+    }
+    
+    .login-input {
+        width: 100%;
+        padding: 1rem 1rem 1rem 3rem;
+        border: 2px solid #e9ecef;
+        border-radius: 15px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: white;
+    }
+    
+    .login-input:focus {
+        border-color: var(--verde);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+    }
+    
+    .login-input.admin-mode:focus {
+        border-color: var(--vermelho);
+        box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+    }
+    
+    /* Mensagem de erro */
+    .error-message-login {
+        background: #f8d7da;
+        color: #721c24;
+        padding: 1rem;
+        border-radius: 15px;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border-left: 5px solid var(--vermelho);
+        animation: shake 0.5s ease;
+    }
+    
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+        20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+    
+    /* Opções do login */
+    .login-options {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 1rem 0;
+    }
+    
+    .remember-me {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #6c757d;
+        cursor: pointer;
+    }
+    
+    .remember-me input {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+        accent-color: var(--verde);
+    }
+    
+    .forgot-password {
+        color: var(--vermelho);
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: color 0.3s ease;
+    }
+    
+    .forgot-password:hover {
+        color: var(--vermelho-escuro);
+        text-decoration: underline;
+    }
+    
+    /* Botão de login */
+    .btn-login {
+        width: 100%;
+        background: linear-gradient(135deg, var(--verde) 0%, var(--vermelho) 100%);
+        color: white;
+        border: none;
+        padding: 1rem;
+        border-radius: 50px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 1.5rem;
+    }
+    
+    .btn-login:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(40, 167, 69, 0.3);
+    }
+    
+    .btn-login.admin-mode {
+        background: linear-gradient(135deg, var(--vermelho) 0%, #c82333 100%);
+    }
+    
+    .btn-login.admin-mode:hover {
+        box-shadow: 0 10px 20px rgba(220, 53, 69, 0.3);
+    }
+    
+    .btn-login.professor-mode {
+        background: linear-gradient(135deg, var(--verde) 0%, #218838 100%);
+    }
+    
+    .btn-login.professor-mode:hover {
+        box-shadow: 0 10px 20px rgba(40, 167, 69, 0.3);
+    }
+    
+    /* Footer */
+    .login-footer {
+        text-align: center;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 2px dashed #e9ecef;
+    }
+    
+    .login-footer p {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .system-info {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+    
+    .system-info span {
+        background: #f8f9fa;
+        padding: 0.3rem 1rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        color: #495057;
+    }
+    
+    .system-info i {
+        color: var(--verde);
+        margin-right: 5px;
+    }
+    
+    .back-home {
+        display: inline-block;
+        margin-top: 1rem;
+        color: var(--verde);
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .back-home:hover {
+        color: var(--vermelho);
+        transform: translateX(-5px);
+    }
+    
+    /* Dica de acesso */
+    .access-hint {
+        background: #e7f5ff;
+        border-left: 4px solid #17a2b8;
+        padding: 1rem;
+        border-radius: 10px;
+        margin-top: 1.5rem;
+        font-size: 0.9rem;
+        color: #0c5460;
+    }
+    
+    .access-hint i {
+        margin-right: 8px;
+        color: #17a2b8;
+    }
+    
+    .access-hint small {
+        display: block;
+        margin-top: 0.5rem;
+        color: #6c757d;
+    }
+    
+    @media (max-width: 480px) {
+        .login-card {
+            padding: 1.5rem;
+        }
+        
+        .user-type-selector {
+            flex-direction: column;
+            gap: 0.5rem;
+            border-radius: 20px;
+        }
+        
+        .login-options {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-container">
+    <div class="login-card">
+        <div class="login-header">
+            <div class="login-icon">
+                <i class="fas fa-exchange-alt"></i>
+            </div>
+            <h1 class="login-title">Bem-vindo!</h1>
+            <p class="login-subtitle">Sistema de Permuta de Aulas</p>
+        </div>
+        
+        {% if form.errors %}
+            <div class="error-message-login">
+                <i class="fas fa-exclamation-circle"></i>
+                <div>
+                    <strong>Erro no login:</strong> Usuário ou senha inválidos. Tente novamente.
+                </div>
+            </div>
+        {% endif %}
+        
+        <!-- Seletor de tipo de usuário -->
+        <div class="user-type-selector" id="userTypeSelector">
+            <div class="user-type-option professor active" data-type="professor" id="optionProfessor">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span>Professor</span>
+            </div>
+            <div class="user-type-option admin" data-type="admin" id="optionAdmin">
+                <i class="fas fa-user-tie"></i>
+                <span>Administrador</span>
+            </div>
+        </div>
+        
+        <form method="post" class="login-form" id="loginForm">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="{{ form.username.id_for_label }}" id="usernameLabel">
+                    <i class="fas fa-user" id="usernameIcon"></i> Usuário
+                </label>
+                <div class="input-group">
+                    <span class="input-icon">
+                        <i class="fas fa-user" id="inputIcon"></i>
+                    </span>
+                    <input type="text" name="username" id="{{ form.username.id_for_label }}" 
+                           class="login-input" id="usernameInput"
+                           placeholder="Digite seu usuário" required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.password.id_for_label }}" id="passwordLabel">
+                    <i class="fas fa-lock" id="passwordIcon"></i> Senha
+                </label>
+                <div class="input-group">
+                    <span class="input-icon">
+                        <i class="fas fa-lock" id="inputLockIcon"></i>
+                    </span>
+                    <input type="password" name="password" id="{{ form.password.id_for_label }}" 
+                           class="login-input" id="passwordInput"
+                           placeholder="Digite sua senha" required>
+                </div>
+            </div>
+            
+            <div class="login-options">
+                <label class="remember-me">
+                    <input type="checkbox" name="remember" id="remember">
+                    <span>Lembrar-me</span>
+                </label>
+                <a href="#" class="forgot-password">
+                    <i class="fas fa-question-circle"></i> Esqueceu a senha?
+                </a>
+            </div>
+            
+            <!-- Campo oculto para identificar o tipo de login -->
+            <input type="hidden" name="user_type" id="userType" value="professor">
+            
+            <button type="submit" class="btn-login" id="loginButton">
+                <i class="fas fa-sign-in-alt" id="buttonIcon"></i>
+                <span id="buttonText">Entrar como Professor</span>
+            </button>
+        </form>
+        
+        <!-- Dicas de acesso (visíveis apenas em desenvolvimento) -->
+        {% if debug %}
+        <div class="access-hint">
+            <i class="fas fa-info-circle"></i>
+            <strong>Dicas de acesso:</strong>
+            <br>
+            <small>👨‍🏫 <strong>Professor:</strong> Use suas credenciais normais</small>
+            <br>
+            <small>👔 <strong>Admin:</strong> Use um usuário com privilégios de administrador (staff)</small>
+        </div>
+        {% endif %}
+        
+        <div class="login-footer">
+            <p>
+                <i class="fas fa-shield-alt text-success me-1"></i>
+                Sistema seguro com autenticação de usuários
+            </p>
+            <div class="system-info">
+                <span>
+                    <i class="fas fa-clock"></i> Versão 2.0
+                </span>
+                <span>
+                    <i class="fas fa-lock"></i> SSL Secure
+                </span>
+            </div>
+            <a href="{% url 'home' %}" class="back-home">
+                <i class="fas fa-arrow-left"></i>
+                Voltar para página inicial
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const optionProfessor = document.getElementById('optionProfessor');
+    const optionAdmin = document.getElementById('optionAdmin');
+    const loginButton = document.getElementById('loginButton');
+    const buttonText = document.getElementById('buttonText');
+    const buttonIcon = document.getElementById('buttonIcon');
+    const userTypeInput = document.getElementById('userType');
+    const usernameInput = document.querySelector('input[name="username"]');
+    const passwordInput = document.querySelector('input[name="password"]');
+    const usernameLabel = document.getElementById('usernameLabel');
+    const passwordLabel = document.getElementById('passwordLabel');
+    const usernameIcon = document.getElementById('usernameIcon');
+    const passwordIcon = document.getElementById('passwordIcon');
+    const inputIcon = document.getElementById('inputIcon');
+    const inputLockIcon = document.getElementById('inputLockIcon');
+    
+    // Função para atualizar a interface para Professor
+    function setProfessorMode() {
+        // Atualizar classes
+        optionProfessor.classList.add('active');
+        optionAdmin.classList.remove('active');
+        
+        // Atualizar botão
+        loginButton.classList.remove('admin-mode');
+        loginButton.classList.add('professor-mode');
+        buttonText.textContent = 'Entrar como Professor';
+        buttonIcon.style.color = 'white';
+        
+        // Atualizar inputs
+        usernameInput.classList.remove('admin-mode');
+        passwordInput.classList.remove('admin-mode');
+        
+        // Atualizar cores dos ícones
+        usernameIcon.style.color = 'var(--verde)';
+        passwordIcon.style.color = 'var(--verde)';
+        inputIcon.style.color = 'var(--verde)';
+        inputLockIcon.style.color = 'var(--verde)';
+        
+        // Atualizar labels
+        usernameLabel.innerHTML = '<i class="fas fa-chalkboard-teacher" style="color: var(--verde);"></i> Usuário (Professor)';
+        passwordLabel.innerHTML = '<i class="fas fa-lock" style="color: var(--verde);"></i> Senha';
+        
+        // Atualizar campo oculto
+        userTypeInput.value = 'professor';
+    }
+    
+    // Função para atualizar a interface para Admin
+    function setAdminMode() {
+        // Atualizar classes
+        optionAdmin.classList.add('active');
+        optionProfessor.classList.remove('active');
+        
+        // Atualizar botão
+        loginButton.classList.remove('professor-mode');
+        loginButton.classList.add('admin-mode');
+        buttonText.textContent = 'Entrar como Administrador';
+        buttonIcon.style.color = 'white';
+        
+        // Atualizar inputs
+        usernameInput.classList.add('admin-mode');
+        passwordInput.classList.add('admin-mode');
+        
+        // Atualizar cores dos ícones
+        usernameIcon.style.color = 'var(--vermelho)';
+        passwordIcon.style.color = 'var(--vermelho)';
+        inputIcon.style.color = 'var(--vermelho)';
+        inputLockIcon.style.color = 'var(--vermelho)';
+        
+        // Atualizar labels
+        usernameLabel.innerHTML = '<i class="fas fa-user-tie" style="color: var(--vermelho);"></i> Usuário (Admin)';
+        passwordLabel.innerHTML = '<i class="fas fa-lock" style="color: var(--vermelho);"></i> Senha';
+        
+        // Atualizar campo oculto
+        userTypeInput.value = 'admin';
+    }
+    
+    // Event listeners para as opções
+    optionProfessor.addEventListener('click', setProfessorMode);
+    optionAdmin.addEventListener('click', setAdminMode);
+    
+    // Validação do formulário
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(e) {
+        if (!usernameInput.value || !passwordInput.value) {
+            e.preventDefault();
+            alert('Por favor, preencha usuário e senha.');
+        }
+    });
+    
+    // Placeholders dinâmicos
+    usernameInput.addEventListener('focus', function() {
+        if (userTypeInput.value === 'admin') {
+            this.placeholder = 'Digite seu usuário de administrador';
+        } else {
+            this.placeholder = 'Digite seu usuário (matrícula)';
+        }
+    });
+    
+    usernameInput.addEventListener('blur', function() {
+        this.placeholder = 'Digite seu usuário';
+    });
+    
+    // Modo inicial (Professor)
+    setProfessorMode();
+});
+</script>
+{% endblock %}

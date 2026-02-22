@@ -1,0 +1,357 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Registrar Reposição - Sistema de Permuta{% endblock %}
+
+{% block extra_css %}
+<style>
+    .reposicao-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .reposicao-card {
+        background: white;
+        border-radius: 30px;
+        padding: 2rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        border: 1px solid rgba(40, 167, 69, 0.2);
+    }
+    
+    .permuta-info {
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+        border-radius: 20px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border-left: 5px solid var(--verde);
+    }
+    
+    .info-grid-reposicao {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+    
+    .info-item-reposicao {
+        background: white;
+        padding: 1rem;
+        border-radius: 15px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    
+    .info-label-reposicao {
+        font-size: 0.85rem;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 0.5rem;
+    }
+    
+    .info-value-reposicao {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #343a40;
+    }
+    
+    .form-reposicao {
+        background: #f8f9fa;
+        border-radius: 20px;
+        padding: 2rem;
+        margin-top: 2rem;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+    
+    .form-control-custom {
+        width: 100%;
+        padding: 1rem;
+        border: 2px solid #e9ecef;
+        border-radius: 15px;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+    }
+    
+    .form-control-custom:focus {
+        border-color: var(--verde);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+    }
+    
+    .form-control-custom.error {
+        border-color: var(--vermelho);
+    }
+    
+    .date-input-wrapper {
+        position: relative;
+    }
+    
+    .date-input-wrapper i {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+    }
+    
+    .help-text {
+        font-size: 0.85rem;
+        color: #6c757d;
+        margin-top: 0.3rem;
+    }
+    
+    .error-message {
+        color: var(--vermelho);
+        font-size: 0.85rem;
+        margin-top: 0.3rem;
+    }
+    
+    .reposicao-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        margin-top: 2rem;
+    }
+    
+    .btn-save {
+        background: linear-gradient(135deg, var(--verde) 0%, var(--vermelho) 100%);
+        color: white;
+        border: none;
+        padding: 1rem 3rem;
+        border-radius: 50px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .btn-save:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+    }
+    
+    .btn-cancel-reposicao {
+        background: transparent;
+        color: var(--vermelho);
+        border: 2px solid var(--vermelho);
+        padding: 1rem 3rem;
+        border-radius: 50px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-cancel-reposicao:hover {
+        background: var(--vermelho);
+        color: white;
+    }
+    
+    .calendar-icon {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+        pointer-events: none;
+    }
+    
+    @media (max-width: 768px) {
+        .reposicao-card {
+            padding: 1rem;
+        }
+        
+        .reposicao-actions {
+            flex-direction: column;
+        }
+        
+        .btn-save, .btn-cancel-reposicao {
+            width: 100%;
+            text-align: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="reposicao-container">
+    <div class="reposicao-card">
+        <h2 class="mb-4">
+            <i class="fas fa-calendar-plus text-success me-2"></i>
+            Registrar Reposição
+        </h2>
+        
+        <p class="text-muted mb-4">
+            Professor(a): <strong>{{ professor.nome }}</strong>
+        </p>
+        
+        <!-- Informações da Permuta -->
+        <div class="permuta-info">
+            <h5 class="mb-3">
+                <i class="fas fa-exchange-alt text-primary me-2"></i>
+                Permuta Relacionada
+            </h5>
+            
+            <div class="info-grid-reposicao">
+                <div class="info-item-reposicao">
+                    <div class="info-label-reposicao">
+                        <i class="fas fa-hashtag"></i> Código
+                    </div>
+                    <div class="info-value-reposicao">#{{ permuta.id }}</div>
+                </div>
+                
+                <div class="info-item-reposicao">
+                    <div class="info-label-reposicao">
+                        <i class="fas fa-tag"></i> Status
+                    </div>
+                    <div class="info-value-reposicao">
+                        <span class="badge-status status-aguardando">
+                            {{ permuta.get_status_display }}
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="info-item-reposicao">
+                    <div class="info-label-reposicao">
+                        <i class="fas fa-calendar-day"></i> Data Aula
+                    </div>
+                    <div class="info-value-reposicao">{{ permuta.data_aula|date:"d/m/Y" }}</div>
+                </div>
+                
+                <div class="info-item-reposicao">
+                    <div class="info-label-reposicao">
+                        <i class="fas fa-users"></i> Turma
+                    </div>
+                    <div class="info-value-reposicao">{{ permuta.horario.turma.codigo_turma }}</div>
+                </div>
+                
+                <div class="info-item-reposicao">
+                    <div class="info-label-reposicao">
+                        <i class="fas fa-book"></i> Disciplina
+                    </div>
+                    <div class="info-value-reposicao">{{ permuta.horario.disciplina.nome }}</div>
+                </div>
+                
+                <div class="info-item-reposicao">
+                    <div class="info-label-reposicao">
+                        <i class="fas fa-user-tie"></i> Substituto
+                    </div>
+                    <div class="info-value-reposicao">{{ permuta.professor_substituto.nome }}</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Formulário de Reposição -->
+        <div class="form-reposicao">
+            <h5 class="mb-4">
+                <i class="fas fa-edit text-success me-2"></i>
+                Dados da Reposição
+            </h5>
+            
+            <form method="post" id="form-reposicao">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="{{ form.data_reposicao.id_for_label }}">
+                        <i class="fas fa-calendar-alt me-2 text-success"></i>
+                        {{ form.data_reposicao.label }}
+                    </label>
+                    <div class="date-input-wrapper">
+                        {{ form.data_reposicao }}
+                        <i class="fas fa-calendar-alt calendar-icon"></i>
+                    </div>
+                    {% if form.data_reposicao.help_text %}
+                        <div class="help-text">{{ form.data_reposicao.help_text }}</div>
+                    {% endif %}
+                    {% if form.data_reposicao.errors %}
+                        <div class="error-message">
+                            {% for error in form.data_reposicao.errors %}
+                                <i class="fas fa-exclamation-circle"></i> {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.observacao.id_for_label }}">
+                        <i class="fas fa-comment me-2 text-success"></i>
+                        {{ form.observacao.label }}
+                    </label>
+                    {{ form.observacao }}
+                    {% if form.observacao.help_text %}
+                        <div class="help-text">{{ form.observacao.help_text }}</div>
+                    {% endif %}
+                    {% if form.observacao.errors %}
+                        <div class="error-message">
+                            {% for error in form.observacao.errors %}
+                                <i class="fas fa-exclamation-circle"></i> {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="alert alert-info mt-3">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Ao registrar a reposição, o professor substituto poderá confirmar a permuta.
+                </div>
+                
+                <div class="reposicao-actions">
+                    <a href="{% url 'minhas_permutas' %}" class="btn-cancel-reposicao">
+                        <i class="fas fa-times me-2"></i>
+                        Cancelar
+                    </a>
+                    <button type="submit" class="btn-save">
+                        <i class="fas fa-save me-2"></i>
+                        Salvar Reposição
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Validação do formulário
+    const form = document.getElementById('form-reposicao');
+    
+    form.addEventListener('submit', function(e) {
+        const dataReposicao = document.getElementById('{{ form.data_reposicao.id_for_label }}');
+        
+        if (!dataReposicao.value) {
+            e.preventDefault();
+            alert('Por favor, preencha a data da reposição.');
+            dataReposicao.classList.add('error');
+        }
+    });
+    
+    // Máscara para data (opcional, se não estiver usando o widget do Django)
+    const dataInput = document.getElementById('{{ form.data_reposicao.id_for_label }}');
+    if (dataInput && dataInput.type === 'text') {
+        dataInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length >= 2) {
+                value = value.substring(0,2) + '/' + value.substring(2);
+            }
+            if (value.length >= 5) {
+                value = value.substring(0,5) + '/' + value.substring(5,9);
+            }
+            e.target.value = value;
+        });
+    }
+});
+</script>
+{% endblock %}
+{% endblock %}

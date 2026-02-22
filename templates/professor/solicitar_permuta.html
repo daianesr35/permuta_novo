@@ -1,0 +1,280 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Solicitar Permuta - Sistema de Permuta{% endblock %}
+
+{% block extra_css %}
+<style>
+    .solicitar-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .solicitar-card {
+        background: white;
+        border-radius: 30px;
+        padding: 2rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    .horario-selecionado {
+        background: linear-gradient(135deg, #e8f5e9 0%, #ffffff 100%);
+        border-radius: 20px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border-left: 5px solid var(--verde);
+    }
+    
+    .info-row {
+        display: flex;
+        margin-bottom: 0.8rem;
+        align-items: center;
+    }
+    
+    .info-icon {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, var(--verde) 0%, var(--vermelho) 100%);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        margin-right: 1rem;
+    }
+    
+    .info-content {
+        flex: 1;
+    }
+    
+    .info-label {
+        font-size: 0.85rem;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .info-value {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #343a40;
+    }
+    
+    .form-solicitar {
+        background: #f8f9fa;
+        border-radius: 20px;
+        padding: 2rem;
+        margin-top: 2rem;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+    
+    .form-control-custom {
+        width: 100%;
+        padding: 1rem;
+        border: 2px solid #e9ecef;
+        border-radius: 15px;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+        background: white;
+    }
+    
+    .form-control-custom:focus {
+        border-color: var(--verde);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+    }
+    
+    .solicitar-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        margin-top: 2rem;
+    }
+    
+    .btn-submit {
+        background: linear-gradient(135deg, var(--verde) 0%, var(--vermelho) 100%);
+        color: white;
+        border: none;
+        padding: 1rem 3rem;
+        border-radius: 50px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+    }
+    
+    .btn-cancel-solicitar {
+        background: transparent;
+        color: var(--vermelho);
+        border: 2px solid var(--vermelho);
+        padding: 1rem 3rem;
+        border-radius: 50px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-cancel-solicitar:hover {
+        background: var(--vermelho);
+        color: white;
+    }
+    
+    @media (max-width: 768px) {
+        .solicitar-card {
+            padding: 1rem;
+        }
+        
+        .solicitar-actions {
+            flex-direction: column;
+        }
+        
+        .btn-submit, .btn-cancel-solicitar {
+            width: 100%;
+            text-align: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="solicitar-container">
+    <div class="solicitar-card">
+        <h2 class="mb-4">
+            <i class="fas fa-exchange-alt text-success me-2"></i>
+            Solicitar Permuta
+        </h2>
+        
+        <p class="text-muted mb-4">
+            Professor(a): <strong>{{ professor.nome }}</strong>
+        </p>
+        
+        <!-- Horário Selecionado -->
+        <div class="horario-selecionado">
+            <h5 class="mb-3">
+                <i class="fas fa-clock text-success me-2"></i>
+                Horário Selecionado
+            </h5>
+            
+            <div class="info-row">
+                <div class="info-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="info-content">
+                    <div class="info-label">Turma</div>
+                    <div class="info-value">{{ horario.turma.codigo_turma }}</div>
+                </div>
+            </div>
+            
+            <div class="info-row">
+                <div class="info-icon">
+                    <i class="fas fa-book"></i>
+                </div>
+                <div class="info-content">
+                    <div class="info-label">Disciplina</div>
+                    <div class="info-value">{{ horario.disciplina.nome }}</div>
+                </div>
+            </div>
+            
+            <div class="info-row">
+                <div class="info-icon">
+                    <i class="fas fa-calendar-day"></i>
+                </div>
+                <div class="info-content">
+                    <div class="info-label">Dia da Semana</div>
+                    <div class="info-value">{{ horario.get_dia_semana_display }}</div>
+                </div>
+            </div>
+            
+            <div class="info-row">
+                <div class="info-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="info-content">
+                    <div class="info-label">Horário</div>
+                    <div class="info-value">{{ horario.hora_inicio }} - {{ horario.hora_fim }}</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Formulário de Solicitação -->
+        <div class="form-solicitar">
+            <h5 class="mb-4">
+                <i class="fas fa-edit text-success me-2"></i>
+                Dados da Permuta
+            </h5>
+            
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="{{ form.data_aula.id_for_label }}">
+                        <i class="fas fa-calendar-alt me-2 text-success"></i>
+                        Data da Aula
+                    </label>
+                    <input type="date" name="data_aula" class="form-control-custom" 
+                           id="{{ form.data_aula.id_for_label }}" 
+                           value="{{ form.data_aula.value|date:'Y-m-d' }}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.professor_substituto.id_for_label }}">
+                        <i class="fas fa-user-tie me-2 text-success"></i>
+                        Professor Substituto
+                    </label>
+                    <select name="professor_substituto" class="form-control-custom" 
+                            id="{{ form.professor_substituto.id_for_label }}" required>
+                        <option value="">Selecione um professor</option>
+                        {% for prof in form.fields.professor_substituto.queryset %}
+                            <option value="{{ prof.id }}">{{ prof.nome }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.motivo.id_for_label }}">
+                        <i class="fas fa-comment me-2 text-success"></i>
+                        Motivo da Permuta
+                    </label>
+                    <textarea name="motivo" class="form-control-custom" 
+                              id="{{ form.motivo.id_for_label }}" rows="4" 
+                              placeholder="Descreva o motivo da permuta..." required></textarea>
+                </div>
+                
+                <div class="alert alert-info mt-3">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Após a solicitação, você precisará registrar a data da reposição.
+                </div>
+                
+                <div class="solicitar-actions">
+                    <a href="{% url 'meus_horarios' %}" class="btn-cancel-solicitar">
+                        <i class="fas fa-times me-2"></i>
+                        Cancelar
+                    </a>
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-paper-plane me-2"></i>
+                        Enviar Solicitação
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
