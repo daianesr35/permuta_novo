@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}Estatísticas de Permutas{% endblock %}
+
+{% block content %}
+<h2>Estatísticas de Permutas</h2>
+
+<p>
+    Nesta página, a coordenação visualiza um resumo gráfico e numérico
+    das permutas e reposições registradas no sistema.
+</p>
+
+<hr>
+
+<h3>Resumo geral</h3>
+<ul>
+    <li><strong>Total de permutas:</strong> {{ total_permutas }}</li>
+    <li><strong>Permutas aprovadas:</strong> {{ permutas_aprovadas }}</li>
+    <li><strong>Permutas pendentes:</strong> {{ permutas_pendentes }}</li>
+    <li><strong>Permutas canceladas:</strong> {{ permutas_canceladas }}</li>
+</ul>
+
+<hr>
+
+<h3>Gráfico – Distribuição por status</h3>
+{% if grafico_pizza %}
+    <div style="margin: 20px 0;">
+        <img src="data:image/png;base64,{{ grafico_pizza }}" alt="Gráfico de pizza - status das permutas">
+    </div>
+{% else %}
+    <p><em>Não há dados suficientes para gerar o gráfico de status.</em></p>
+{% endif %}
+
+<hr>
+
+<h3>Gráfico – Permutas por mês (últimos 6 meses)</h3>
+{% if grafico_barras %}
+    <div style="margin: 20px 0;">
+        <img src="data:image/png;base64,{{ grafico_barras }}" alt="Gráfico de barras - permutas por mês">
+    </div>
+{% else %}
+    <p><em>Não há dados suficientes para gerar o gráfico mensal.</em></p>
+{% endif %}
+
+<hr>
+
+<h3>Top 5 professores que mais solicitam permutas</h3>
+{% if top_professores %}
+    <table border="1" cellspacing="0" cellpadding="5">
+        <thead>
+            <tr>
+                <th>Professor</th>
+                <th>Matrícula SIAPE</th>
+                <th>Total de permutas solicitadas</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for prof in top_professores %}
+                <tr>
+                    <td>
+                        {{ prof.user.get_full_name|default:prof.user.username }}
+                    </td>
+                    <td>{{ prof.matricula_siape }}</td>
+                    <td>{{ prof.total_permutas }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p><em>Ainda não há registros de permutas para montar o ranking de professores.</em></p>
+{% endif %}
+
+<hr>
+
+<h3>Top 5 disciplinas mais permutadas</h3>
+{% if top_disciplinas %}
+    <table border="1" cellspacing="0" cellpadding="5">
+        <thead>
+            <tr>
+                <th>Disciplina</th>
+                <th>Total de permutas</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for disc in top_disciplinas %}
+                <tr>
+                    <td>{{ disc.nome }}</td>
+                    <td>{{ disc.total_permutas }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p><em>Não há dados de disciplinas permutadas para exibir.</em></p>
+{% endif %}
+
+<hr>
+
+<h3>Permutas por dia da semana</h3>
+{% if permutas_por_dia %}
+    <table border="1" cellspacing="0" cellpadding="5">
+        <thead>
+            <tr>
+                <th>Dia da semana</th>
+                <th>Quantidade de permutas</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in permutas_por_dia %}
+                <tr>
+                    <td>{{ item.dia }}</td>
+                    <td>{{ item.quantidade }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p><em>Não há registros de permutas por dia da semana.</em></p>
+{% endif %}
+
+<hr>
+
+<p>
+    <a href="{% url 'admin_dashboard' %}">Voltar para o painel da coordenação</a>
+</p>
+{% endblock %}

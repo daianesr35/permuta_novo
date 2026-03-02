@@ -81,8 +81,8 @@ cd permuta_novo
 python -m venv .venv
 .venv\Scripts\activate
 
-3. Instalar as dependências
-pip install django
+3. Instalar as dependências e bibliotecas
+pip install -r requirements.txt
 
 4. Aplicar as migrações do banco
 python manage.py migrate

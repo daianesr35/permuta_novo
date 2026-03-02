@@ -227,7 +227,7 @@ def meus_horarios(request):
             "Seu usuário ainda não está vinculado a um cadastro de professor. "
             "Peça ao administrador para criar o seu cadastro de Professor."
         )
-        return render(request, "sem_professor.html", {"usuario": usuario})
+        return render(request, "professor/sem_professor.html", {"usuario": usuario})
 
     horarios = HorarioAula.objects.filter(
         professor=professor
@@ -741,106 +741,143 @@ def dashboard_estatisticas(request):
     Apenas para staff/coordenação
     """
     usuario = request.user
-    
+
     if not usuario.is_staff:
         messages.error(request, "Acesso restrito à coordenação.")
         return redirect("home")
-    
+
     hoje = timezone.now().date()
-    
+
     # Estatísticas gerais
     total_permutas = Permuta.objects.count()
-    permutas_aprovadas = Permuta.objects.filter(status='APROVADA').count()
-    permutas_pendentes = Permuta.objects.filter(status='PENDENTE').count()
-    permutas_canceladas = Permuta.objects.filter(status='CANCELADA').count()
-    
+    permutas_aprovadas = Permuta.objects.filter(status="APROVADA").count()
+    permutas_pendentes = Permuta.objects.filter(status="PENDENTE").count()
+    permutas_canceladas = Permuta.objects.filter(status="CANCELADA").count()
+
     # Permutas por mês (últimos 6 meses)
     meses = []
     dados_mensais = []
-    
+
     for i in range(5, -1, -1):
-        data = hoje - timedelta(days=30*i)
-        meses.append(data.strftime('%b/%Y'))
-        
-        mes_inicio = hoje - timedelta(days=30*(i+1))
-        mes_fim = hoje - timedelta(days=30*i)
+        data = hoje - timedelta(days=30 * i)
+        meses.append(data.strftime("%b/%Y"))
+
+        mes_inicio = hoje - timedelta(days=30 * (i + 1))
+        mes_fim = hoje - timedelta(days=30 * i)
+
         count = Permuta.objects.filter(
             data_solicitacao__date__gte=mes_inicio,
-            data_solicitacao__date__lt=mes_fim
+            data_solicitacao__date__lt=mes_fim,
         ).count()
         dados_mensais.append(count)
-    
+
+    # =========================
     # Gráfico de Pizza - Status das Permutas
-    fig1, ax1 = plt.subplots(figsize=(6,4))
+    # =========================
+    fig1, ax1 = plt.subplots(figsize=(6, 4))
     status_counts = [permutas_aprovadas, permutas_pendentes, permutas_canceladas]
-    status_labels = ['Aprovadas', 'Pendentes', 'Canceladas']
-    colors = ['#28a745', '#ffc107', '#dc3545']
-    
+    status_labels = ["Aprovadas", "Pendentes", "Canceladas"]
+    colors = ["#28a745", "#ffc107", "#dc3545"]
+
     if sum(status_counts) > 0:
-        ax1.pie(status_counts, labels=status_labels, colors=colors, autopct='%1.1f%%', startangle=90)
-        ax1.axis('equal')
-        ax1.set_title('Distribuição por Status', fontsize=14, fontweight='bold')
+        # Não colocamos labels direto nas fatias para evitar sobreposição
+        wedges, texts, autotexts = ax1.pie(
+            status_counts,
+            labels=None,  # sem rótulo de texto na borda da fatia
+            colors=colors,
+            autopct="%1.1f%%",
+            startangle=90,
+        )
+
+        # Deixa o círculo “certinho”
+        ax1.axis("equal")
+        ax1.set_title("Distribuição por Status", fontsize=14, fontweight="bold")
+
+        # Ajusta o estilo do percentual sobre as fatias
+        for autot in autotexts:
+            autot.set_color("white")
+            autot.set_fontsize(9)
+
+        # Legenda com os nomes dos status, ao lado do gráfico
+        ax1.legend(
+            wedges,
+            status_labels,
+            title="Status",
+            loc="center left",
+            bbox_to_anchor=(1, 0.5),
+        )
     else:
-        ax1.text(0.5, 0.5, 'Sem dados', ha='center', va='center')
+        ax1.text(0.5, 0.5, "Sem dados", ha="center", va="center")
         ax1.set_xlim(-1, 1)
         ax1.set_ylim(-1, 1)
-    
+
     buffer1 = io.BytesIO()
-    plt.savefig(buffer1, format='png', bbox_inches='tight')
+    plt.savefig(buffer1, format="png", bbox_inches="tight")
     buffer1.seek(0)
     grafico_pizza = base64.b64encode(buffer1.getvalue()).decode()
     plt.close(fig1)
-    
+
+    # =========================
     # Gráfico de Barras - Permutas por Mês
-    fig2, ax2 = plt.subplots(figsize=(8,4))
-    bars = ax2.bar(meses, dados_mensais, color='#28a745', alpha=0.7)
-    ax2.set_xlabel('Mês')
-    ax2.set_ylabel('Quantidade')
-    ax2.set_title('Permutas por Mês (últimos 6 meses)', fontsize=14, fontweight='bold')
-    ax2.tick_params(axis='x', rotation=45)
-    
+    # =========================
+    fig2, ax2 = plt.subplots(figsize=(8, 4))
+    bars = ax2.bar(meses, dados_mensais, color="#28a745", alpha=0.7)
+    ax2.set_xlabel("Mês")
+    ax2.set_ylabel("Quantidade")
+    ax2.set_title("Permutas por Mês (últimos 6 meses)", fontsize=14, fontweight="bold")
+    ax2.tick_params(axis="x", rotation=45)
+
     for bar in bars:
         height = bar.get_height()
-        ax2.text(bar.get_x() + bar.get_width()/2., height,
-                f'{int(height)}', ha='center', va='bottom')
-    
+        ax2.text(
+            bar.get_x() + bar.get_width() / 2.0,
+            height,
+            f"{int(height)}",
+            ha="center",
+            va="bottom",
+        )
+
     buffer2 = io.BytesIO()
-    plt.savefig(buffer2, format='png', bbox_inches='tight')
+    plt.savefig(buffer2, format="png", bbox_inches="tight")
     buffer2.seek(0)
     grafico_barras = base64.b64encode(buffer2.getvalue()).decode()
     plt.close(fig2)
-    
+
     # Top 5 professores que mais solicitam permutas
     top_professores = Professor.objects.annotate(
-        total_permutas=Count('permutas_solicitadas')
-    ).order_by('-total_permutas')[:5]
-    
+        total_permutas=Count("permutas_solicitadas")
+    ).order_by("-total_permutas")[:5]
+
     # Top 5 disciplinas mais permutadas
     top_disciplinas = Disciplina.objects.annotate(
-        total_permutas=Count('horarioaula__permuta')
-    ).order_by('-total_permutas')[:5]
-    
+        total_permutas=Count("horarioaula__permuta")
+    ).order_by("-total_permutas")[:5]
+
     # Permutas por dia da semana
     dias_semana = {
-        2: 'Segunda', 3: 'Terça', 4: 'Quarta',
-        5: 'Quinta', 6: 'Sexta', 7: 'Sábado'
+        2: "Segunda",
+        3: "Terça",
+        4: "Quarta",
+        5: "Quinta",
+        6: "Sexta",
+        7: "Sábado",
     }
     permutas_por_dia = []
     for dia_num, dia_nome in dias_semana.items():
         count = Permuta.objects.filter(horario__dia_semana=dia_num).count()
-        permutas_por_dia.append({'dia': dia_nome, 'quantidade': count})
-    
+        permutas_por_dia.append({"dia": dia_nome, "quantidade": count})
+
     contexto = {
-        'usuario': usuario,
-        'total_permutas': total_permutas,
-        'permutas_aprovadas': permutas_aprovadas,
-        'permutas_pendentes': permutas_pendentes,
-        'permutas_canceladas': permutas_canceladas,
-        'grafico_pizza': grafico_pizza,
-        'grafico_barras': grafico_barras,
-        'top_professores': top_professores,
-        'top_disciplinas': top_disciplinas,
-        'permutas_por_dia': permutas_por_dia,
+        "usuario": usuario,
+        "total_permutas": total_permutas,
+        "permutas_aprovadas": permutas_aprovadas,
+        "permutas_pendentes": permutas_pendentes,
+        "permutas_canceladas": permutas_canceladas,
+        "grafico_pizza": grafico_pizza,
+        "grafico_barras": grafico_barras,
+        "top_professores": top_professores,
+        "top_disciplinas": top_disciplinas,
+        "permutas_por_dia": permutas_por_dia,
     }
     return render(request, "coordenacao/dashboard_estatisticas.html", contexto)
 
